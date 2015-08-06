@@ -1,0 +1,74 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foundation | Welcome</title>
+
+    <!-- Foundation ZURB styles -->
+    <link rel="stylesheet" href="foundation-5.5.1/css/foundation.css" />
+    <script src="foundation-5.5.1/js/vendor/modernizr.js"></script>
+    <link rel="stylesheet" href="foundation-5.5.1/foundation-icons/foundation-icons/foundation-icons.css" />
+
+    <!-- Ryu Topology -->
+    <link rel="stylesheet" type="text/css" href="ryu-topology/ryu.topology.css">
+    <script src="ryu-topology/d3.v3.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+    
+    
+    <div style="width:100%; height:100%">
+      <nav class="top-bar" data-topbar role="navigation" style="background-color:#43AC6A">
+        <ul class="title-area">
+          <li class="name">
+            <h1><a href="#">Routers Reconfigurables de Altas Prestaciones</a></h1>
+          </li>
+        </ul>
+      </nav>
+     
+
+      <div class="" style="height:100%; width:100%; position: absolute; top:0px; padding-top:45px">
+        <div class="large-2 columns" style="padding-left:0%; height:100%">
+          <div class="icon-bar vertical five-up">
+            <a class="item">
+              <i class="fi-home"style="color:white" ></i>
+              <label>Topologia</label>
+            </a>
+            <a class="item">
+              <i class="fi-graph-bar"style="color:white" ></i>
+              <label>Estadisticas</label>
+            </a>
+            <a class="item">
+              <i class="fi-wrench"style="color:white" ></i>
+              <label>Configuracion</label>
+            </a>
+           
+          </div>
+        </div>
+
+        <div class="large-10 columns">
+          
+          <!-- TOPOLOGLY TAB-->
+          <section id="TopologyTab" name="TopologyTab">
+
+          </section>
+
+          <!-- CONFIGURACION TAB-->
+          <section id="ConfigTab" name="ConfigTab">
+            <ul class="tabs vertical" data-tab> <li class="tab-title active"><a href="#panel11">Tab 1</a></li> <li class="tab-title"><a href="#panel21">Tab 2</a></li> <li class="tab-title"><a href="#panel31">Tab 3</a></li> <li class="tab-title"><a href="#panel41">Tab 4</a></li> </ul> <div class="tabs-content"> <div class="content active" id="panel11"> <p>This is the first panel of the basic tab example. You can place all sorts of content here including a grid.</p> </div> <div class="content" id="panel21"> <p>This is the second panel of the basic tab example. This is the second panel of the basic tab example.</p> </div> <div class="content" id="panel31"> <p>This is the third panel of the basic tab example. This is the third panel of the basic tab example.</p> </div> <div class="content" id="panel41"> <p>This is the fourth panel of the basic tab example. This is the fourth panel of the basic tab example.</p> </div> </div>
+          </section>
+
+        </div>
+
+      </div>
+    </div>
+    
+    <script src="foundation-5.5.1/js/vendor/jquery.js"></script>
+    <script src="foundation-5.5.1/js/foundation.min.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
+
+    <script src="ryu-topology/ryu.topology.js" charset="utf-8"></script>
+  </body>
+</html>

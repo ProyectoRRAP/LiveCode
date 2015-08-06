@@ -1,0 +1,117 @@
+
+
+/* *************************************** */
+/* Tool Tipo For routers Styles            */
+/* *************************************** */
+.miniInfoBox{
+	width: 200px;
+	background: #333333;
+  	color: #FFFFFF;
+  	font-family: inherit;
+  	font-weight: normal;
+  	position: absolute;
+  	top: 0;
+  	z-index: 101;
+    display: none;
+}
+
+.miniInfoBox-wrapper{
+	padding: 1rem 1.11111rem 1.33333rem;
+  	width: 100%;
+  	color: #FFFFFF;
+  	font-family: inherit;
+  	font-weight: normal
+}
+
+.miniInfoBox-wrapper h4, p{
+	color: #FFFFFF;
+  	line-height: 1.25;
+  	margin: 0;
+  	font-size: 0.85rem;
+}
+
+.miniInfoBox-wrapper h4{
+  	font-weight: bold;
+ }
+
+.miniInfoBox-wrapper hr{
+    color: #FFFFFF;
+  	font-weight: bold;
+  	line-height: 0.35;
+  	margin: 0px 0px 8px 0px;
+  	font-size: 0.85rem;
+}
+
+.miniInfoBox-Arrow.top{
+  border-color: #333333;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 15px solid;
+}
+
+.miniInfoBox-Arrow.bottom{
+  border-color: #333333;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 15px solid;
+}
+
+.miniInfoBox-Arrow{
+  color: #333333;
+  display: none;
+  /*height: 25px;*/
+  position: absolute;
+  /*width: 25px;*/
+  z-index: 999;
+}
+
+/****** NODES VISUALIZATION *****/
+.node{
+  display: inline-block;
+}
+
+.node.fixed{
+  display: inline-block;
+}
+
+
+.top-bar-section li.selected{
+  border-bottom: solid 1px #008CBA;
+}
+
+.table-head-2-level tr, .table-head-2-level th{
+  font-size: 0.65rem; 
+  font-weight: normal; 
+}
+
+.mpls-table tr, .mpls-table th{
+  font-weight: normal !important;  
+}
+
+.NodeInfoGeneral{
+  font-size: 0.85rem;
+}
+.NodeInfoGeneral span.title{
+  font-weight: bold;
+  margin: 4px 0px 4px 0px;
+}
+
+.NodeInfoInterfaces, .NodeInfoInterfaces span{
+  font-size: 0.85rem;
+}
+
+.switch-span{
+    display: block;
+    float: left;
+    margin: 0px 20px 0px 0px;
+    line-height: 28px;
+    font-size: 1.15em;
+}
+
+.miniTable tr th, .miniTable tr td{
+  padding: 0rem !important;
+}
+
+#serviceExpandModal .row{
+  margin-bottom: 10px;
+}

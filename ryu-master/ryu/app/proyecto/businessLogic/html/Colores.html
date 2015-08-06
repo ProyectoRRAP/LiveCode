@@ -1,0 +1,98 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <script src="foundation-5.5.1/js/vendor/jquery.js"></script>
+  </head>
+  <body>
+
+  	<label>Color1</label>
+  	<input class="picker" id="color1"/>
+  	<br />
+
+  	<label>Color2</label>
+  	<input class="picker" id="color2" />
+  	<br />
+
+  	<label>Color3</label>
+  	<input class="picker" id="color3" />
+  	<br />
+
+  	<button class="picker" id="cal">calcular</button>
+
+  	<style>
+  		input{
+  			border: 0px;
+  		}
+  	</style>
+  	<script>
+  		$(document).ready(function(){
+
+  			function combineColors(colors){
+  				if(colors.length == 0){
+  					return 'RGB(0,0,0)';
+  				}
+  				else if(colors.length == 1){
+  					return colors[0];
+  				}
+  				else{
+  					var r_sum  = 0;
+  					var g_sum = 0;
+  					var b_sum = 0;
+  					var aux;
+  					for(var i=0; i++; i<colors.length){
+  						//RGB(0,0,0)
+  						aux = colors[i].substring(4,9).split(",");
+  						r_sum += aux[0];
+  						g_sum += aux[1];
+  						b_sum += aux[2];
+  					} 
+  					var r = Math.round(r_sum / colors.length);
+  					var g = Math.round(g_sum / colors.length);
+  					var b = Math.round(b_sum / colors.length);
+  					
+  					return "RGB(" + r + "," + g + "," + b + ")";
+  				}
+  			}
+  			$("#cal").click(function(){
+	  			var color1 = hexToRgb($("#color1").val());
+	  			var color2 = hexToRgb($("#color2").val());
+
+	  			console.log('Color1: rgb('+color1.r + ', ' + color1.g + ', ' + color1.b + ')');
+	  			console.log('Color2: rgb('+color2.r + ', ' + color2.g + ', ' + color2.b + ')');
+
+	  			r = Math.round(Math.abs(color1.r + color2.r)/2);
+	  			g = Math.round(Math.abs(color1.g + color2.g)/2);
+	  			b = Math.round(Math.abs(color1.b + color2.b)/2);
+	  			var result = 'rgb(' + r + ',' + g + ',' + b + ')';
+	  			$("#color3").val(result);
+	  			$("#color3").css({'border-right': '20px solid ' + result});
+  			});
+
+  			$(".picker").keyup(function(){
+  				val = $(this).val();
+  				$(this).css({'border-right': '20px solid ' + val});
+  			});
+  		});
+
+
+
+  		function hexToRgb(hex) {
+		    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+		    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+		        return r + r + g + g + b + b;
+		    });
+
+		    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		    return result ? {
+		        r: parseInt(result[1], 16),
+		        g: parseInt(result[2], 16),
+		        b: parseInt(result[3], 16)
+		    } : null;
+		}
+  	</script>
+  </body>
+</html>

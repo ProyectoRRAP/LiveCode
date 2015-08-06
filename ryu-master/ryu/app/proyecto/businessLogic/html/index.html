@@ -1,0 +1,1394 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAUFlow</title>
+
+    <!-- Foundation ZURB styles -->
+    <link rel="stylesheet" href="foundation-5.5.1/css/foundation.css" />
+    <script src="foundation-5.5.1/js/vendor/modernizr.js"></script>
+    <link rel="stylesheet" href="foundation-5.5.1/foundation-icons/foundation-icons/foundation-icons.css" />
+
+    <!-- Ryu Topology -->
+    <link rel="stylesheet" type="text/css" href="ryu-topology/ryu.topology.css">
+    <script src="ryu-topology/d3.v3.min.js" charset="utf-8"></script>
+
+    <!-- Color picker -->
+    <link rel="stylesheet" href="css/colpick.css" type="text/css"/>
+
+    <link rel="stylesheet" type="text/css" href="css/master.css">
+  </head>
+  <body>
+    
+    
+    <div style="width:100%; height:100%">
+      <nav id="titleBar" class="top-bar" data-topbar role="navigation" style="background-color:#43AC6A">
+        <ul class="title-area">
+          <li class="name">
+            <h1><a href="#">RAUFlow</a></h1>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="" style="height:100%; width:100%; position: absolute; top:0px; padding-top:45px">
+
+        <nav id="topoTabTopBar" class="top-bar" data-topbar role="navigation" style="background-color:transparent; position:absolute; clear: both">
+          <section class="top-bar-section">
+            <!-- Right Nav Section -->
+            <ul class="left">
+              
+              
+            </ul>
+            <ul class="right">
+              <li class="active">
+                <a href="#" id="topologyRenderOpt"><i class="fi-photo"style="color:white" ></i>&nbsp Topologia</a>
+              </li>
+              <li class="divider"></li>
+              <li class="">
+                <a href="#" id="ampliarServiceOpt"><i class="fi-magnifying-glass"style="color:white" ></i>&nbsp Ampliar</a>
+              </li>
+              <li class="divider"></li>
+              <li class="">
+                <a href="#" id="flowsServiceOpt"><i class="fi-share"style="color:white" ></i>&nbsp Flows</a>
+              </li>
+              <li class="divider"></li>
+              <li id="pepe" class="">
+                <a href="#" id="mplsServiceOpt"><i class="fi-shuffle"style="color:white" ></i>&nbsp MPLS</a>
+              </li>
+              <li class="divider"></li>
+              <li class="has-dropdown">
+                <a href="#">&nbsp &nbsp &nbsp Mostrar</a>
+                <ul class="dropdown">
+                  <li><a href="#"><input id="checkbox1" type="checkbox"><label for="checkbox1">Nodos</label></a></li>
+                  <li><a href="#"><input id="checkbox2" type="checkbox"><label for="checkbox2">Links</label></a></li>
+                  <li><a href="#"><input id="checkbox3" type="checkbox"><label for="checkbox3">Hosts</label></a></li>
+                  <li>
+                    <a href="#" id="checkboxRenderServices">Servicios</a></li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+        </nav>
+
+        <div class="large-2 columns" style="padding-left:0%; height:100%">
+          <div id="optionsBar" class="icon-bar vertical five-up">
+            <a id="item-1" class="item">
+              <i class="fi-home"style="color:white" ></i>
+              <label>Dispositivos</label>
+            </a>
+            <a id="item-2" class="item">
+              <i class="fi-graph-bar"style="color:white" ></i>
+              <label>Estadisticas</label>
+            </a>
+            <a id="item-3" class="item">
+              <i class="fi-wrench"style="color:white" ></i>
+              <label>Configuracion</label>
+            </a>
+           
+          </div>
+        </div>
+
+        <div id="Tabs" class="large-10 columns" style=" margin-top: 45px; padding-right: 0px">
+          
+          <!-- TOPOLOGLY TAB-->
+          <section id="tab-1" name="tab-1" class="large-12 columns" style="height: 100%; padding-right: 0px">
+           
+            <div  class="large-12 columns" id="tab-1-topo" style="width: 80%; margin-top: 20px; z-index: 1">
+              <div id="miniInfoBoxesNodes">
+                  
+              </div>
+            </div>
+
+            <div class="large-7 columns right" id="AmpliarTab" style="height: 100%; margin-right: 0px;border-left: 4px solid rgb(51, 51, 51); border-top: 4px solid rgb(51, 51, 51); margin-top:1px; z-index: 2; padding-top: 25px; padding-left: 45px; padding-right: 45px; display: none">
+                
+                <div class="NodeInfoGeneral">
+                  <h4>General</h4>
+                  <div  class="panel">
+                      <div class="row">
+                        <div class="large-4 columns">
+                          <span class="title">Nombre:</span>
+                        </div>
+                        <div class="large-8 columns">
+                          <span id="topoTabAmpliarOptNombre"></span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="large-4 columns">
+                          <span class="title">Datapath-ID:</span>
+                        </div>
+                        <div class="large-8 columns">
+                          <span id="topoTabAmpliarOptDPID"></span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="large-4 columns">
+                          <span class="title">Router-ID:</span>
+                        </div>
+                        <div class="large-8 columns">
+                          <span id="topoTabAmpliarOptRID"></span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="large-4 columns">
+                          <span class="title">Descripcion:</span>
+                        </div>
+                        <div class="large-8 columns">
+                          <span id="topoTabAmpliarOptDesc"></span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="large-4 columns">
+                          <span class="title">Tipo:</span>
+                        </div>
+                        <div class="large-8 columns">
+                          <span id="topoTabAmpliarOptTipo"></span>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="NodeInfoInterfaces">
+                  <div class="row">
+                    <h4>Interfaces</h4>
+                    <div style="width: 100%; height: 250px; overflow-y: scroll">
+                      <table width="100%" >
+                        <thead> 
+                          <tr>
+                            <th colspan="1" width="25%">Nombre</th> 
+                            <th colspan="1" width="15%">Puerto</th>
+                            <th colspan="1" width="30%">Direccion IP</th>
+                            <th colspan="1" width="30%">Direccion MAC</th>
+                          </tr> 
+                        </thead> 
+                        <tbody id="topoTabAmpliarOptInterfaces" class="mpls-table"></tbody> 
+                      </table>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="large-10 columns right" id="flowsTab" style="height: 100%; margin-right: 0px; border-left: 4px solid rgb(51, 51, 51); border-top: 4px solid rgb(51, 51, 51); margin-top:1px; padding-top:25px; z-index: 2; display: none">
+               <div style="height:450px; width:98%; margin-left:2%; overflow-y: scroll; margin-bottom: 20px">
+                  <table width="100%" >
+                    <caption>Flows</caption> 
+                    <thead> 
+                      <tr> 
+                        <th colspan="5" width="52%">Match</th>
+                        <th colspan="1" width="8%"></th>
+                        <th colspan="1" width="8%"></th>
+                        <th colspan="1" width="8%"></th>
+                        <th colspan="1" width="8%"></th>
+                        <th colspan="1" width="8%"></th>
+                        <th colspan="1" width="8%"></th>
+                      </tr> 
+                    </thead> 
+                    <thead class="table-head-2-level">
+                      <tr>  
+                        <th width="8%">Port in</th>
+                        <th width="8%">Dl src</th>
+                        <th width="8%">Dl dst</th>
+                        <th width="8%">Dl type</th>
+                        <th width="8%">Label in</th>
+
+                        <th width="28%">Actions</th>
+                        <th width="8%">Byte Count</th>
+                        <th width="8%">Packet Count</th>
+                        <th width="8%">Duration Sec</th>
+                        <th width="8%">Idle Timeout</th>
+                        <th width="8%">Priority</th>
+                      </tr> 
+                    </thead> 
+                    <tbody id="TabFlowsFlowTable" class="mpls-table"></tbody> 
+                  </table>
+                </div>
+            </div>
+
+            <div class="large-8 columns right" id="mplsTab" style="height: 100%; margin-right: 0px; border-left: 4px solid rgb(51, 51, 51); border-top: 4px solid rgb(51, 51, 51); margin-top:1px; padding-top: 15px; z-index: 2; display: none">
+            
+                <div style="height:250px; width:92%; margin-left:4%; overflow-y: scroll; margin-bottom: 20px">
+                  <table width="100%" >
+                    <caption>FTN(Fec To NHLFE)</caption> 
+                    <thead> 
+                      <tr> 
+                        <th colspan="3" width="60%">Servicio</th>
+                        <th colspan="1" width="10%">Interfaz</th>
+                        <th colspan="1" width="15%">Next hop</th>
+                        <th colspan="2" width="15%">Procesamiento</th>
+                      </tr> 
+                    </thead> 
+                    <thead class="table-head-2-level">
+                      <tr>  
+                        <th width="30%">Nombre</th>
+                        <th width="15%">Ndo ing</th>
+                        <th width="14%">Ndo egr</th>
+
+                        <th width="10%"></th>
+                        <th width="15%"></th>
+                        <th width="8%">Accion</th>
+                        <th width="7%">Etiqueta</th>
+                      </tr> 
+                    </thead> 
+                    <tbody id="TabMplsFTNTable" class="mpls-table"></tbody> 
+                  </table>
+                </div>
+ 
+                <div style="height:250px; width:92%; margin-left:4%; overflow-y: scroll; margin-bottom: 20px">
+                  <table width="100%" >
+                    <caption>ILM(Incomming Label Mapping)</caption>  
+                    <thead> 
+                      <tr> 
+                        <th width="10%">Label</th>
+                        <th width="25%">Interfaz</th>
+                        <th width="25%">Next hop</th>
+                        <th colspan="2" width="40%">Procesamiento</th>
+                      </tr>
+                    </thead>
+                    <thead class="table-head-2-level">
+                      <tr>  
+                        <th width="10%"></th>
+                        <th width="25%"></th>
+                        <th width="25%"></th>
+                        <th width="20">Accion</th>
+                        <th width="20">Etiqueta</th>
+                      </tr> 
+                    </thead> 
+                    <tbody id="TabMplsILMTable" class="mpls-table"></tbody> 
+                  </table>
+                </div>
+            </div>
+
+
+          </section>
+
+          <!-- STATISTICS TAB-->
+          <section id="tab-2" name="tab-2" style="display: none" class="large-12 columns">
+
+          </section>
+
+          <!-- CONFIGURACION TAB-->
+          <section id="tab-3" name="tab-3" style="display:none; padding-top: 20px">
+              <ul class="tabs" data-tab> 
+                <li class="tab-title active"><a href="#panel1">Servicios</a></li> 
+                <li id="configTabNodesSubTab" class="tab-title"><a href="#panel2">Topologia</a></li> 
+              </ul> 
+              <div class="tabs-content"> 
+                <div class="content active" id="panel1"> 
+                  
+                  <div style="height:350px; width:90%; overflow-y: scroll; margin-bottom: 20px">
+                    <table width="100%" > 
+                      <thead> 
+                        <tr> 
+                          <th width="40%">Nombre del servicio</th>
+                          <th width="12%">Nodo ingreso</th>
+                          <th width="12%">Nodo egreso</th>
+                          <th width="12%">Interfaz ingreso</th>
+                          <th width="12%">Interfaz egreso</th> 
+                          <th width="10%">Seleccion</th> 
+                        </tr> 
+                      </thead> 
+                      <tbody id="TabConfigServicesTable"></tbody> 
+                    </table>
+                  </div>
+                  <ul class="button-group left">
+                    <li><a href="#" id="addServiceButton" class="button success" data-reveal-id="serviceAddModal">Agregar</a></li>
+                  </ul>
+
+                  <ul class="button-group right" style="margin-right:10%">
+                    <li><a href="#" id="expandServiceButton" class="button">Ver</a></li>
+                    <li><a href="#" id="updateServiceButton" class="button">Modificar</a></li>
+                    <li><a href="#" id="deleteServiceButton" class="button">Eliminar</a></li>
+                  </ul>
+
+                </div> 
+                <div class="content" id="panel2"> 
+
+                  <span style="color: black; clear: both; margin-bottom: 10px; display: block"><b>Nodos:</b></span>
+                  <div style="height:120px; width:90%; overflow-y: scroll; margin-bottom: 20px">
+                    <table width="100%" class="miniTable"> 
+                      <thead> 
+                        <tr> 
+                          <th width="30%">Nombre</th>
+                          <th width="30%">Router ID</th>
+                          <th width="30%">Datapath ID</th>
+                          <th width="10%">Seleccion</th>
+                        </tr> 
+                      </thead> 
+                      <tbody id="TabConfigNodesTable"></tbody> 
+                    </table>
+                  </div>
+
+                  <ul class="button-group right" style="margin-right:10%">
+                    <li><a href="#" id="editNodeInfoButton" class="tiny button">Editar Informacion</a></li>
+                  </ul>
+
+                  <span style="color: black; clear: both; margin-bottom: 10px; display: block"><b>Interfaces:</b></span>
+                  <div style="height:120px; width:90%; overflow-y: scroll; margin-bottom: 20px">
+                    <table width="100%" class="miniTable"> 
+                      <thead> 
+                        <tr> 
+                          <th width="25%">Nombre</th>
+                          <th width="25%">Direccion IP</th>
+                          <th width="25%">Direccion MAC</th>
+                          <th width="15%">Puerto</th>
+                          <th width="10%">Seleccion</th>
+                        </tr> 
+                      </thead> 
+                      <tbody id="TabConfigNodesInterfaesTable"></tbody> 
+                    </table>
+                  </div>
+
+                  <ul class="button-group right" style="margin-right:10%">
+                    <li><a href="#" id="editNodeIfaceInfoButton" class="tiny button">Editar Informacion</a></li>
+                  </ul>
+
+                </div> 
+                
+              </div>
+          </section>
+
+        </div>
+
+      </div>
+    </div>
+    
+    <!--- MODALES -->
+    <!-- Service Add Modal -->
+    <div id="serviceAddModal" class="reveal-modal medium" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true">
+      <h3 id="firstModalTitle">Nuevo servicio</h3>
+      <hr></hr>
+      <form id="addServiceForm" class="smoothForm" name="addServiceModal">
+
+          <div style="width:100%; height: 300px; overflow-y: scroll">
+            <div class="row">
+              <div class="large-8 columns end">
+                <label>Nombre del Servicio
+                    <input class="" id="addServiceForm_serviceName" name="addServiceForm_serviceName" type="text" placeholder="Nombre del Servicio" />
+                    <small id="addServiceForm_serviceName_validate" class="error" style="display: none">Invalid entry</small>
+                </label>
+              </div>
+              <div class="large-2 columns end">
+                <label>Color
+                   #<input type="text" id="addServiceForm_serviceColorPicker" placeholder="43AC6A" value="43AC6A" /> 
+                </label>
+              </div>
+                 
+            </div>
+
+            <div class="row">
+              <div class="large-12 columns">
+                <span class="span-1">Nodo de ingreso</span>
+              </div> 
+              <div class="large-5 columns">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Nodo</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="addServiceForm_IngressNode" name="addServiceForm_IngressNode" class="">
+                    <option value="-1">--Seleccionar--</option>
+                  </select>
+                  <small id="addServiceForm_IngressNode_validate" class="error" style="display: none">Invalid entry</small>
+                </div>
+              </div>
+              <div class="large-5 columns end">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Interfaz</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="addServiceForm_IngressInterface" name="addServiceForm_IngressInterface"></select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="large-12 columns">
+                <span class="span-1">Nodo de egreso</span>
+              </div>
+              <div class="large-5 columns">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Nodo</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="addServiceForm_EgressNode" name="addServiceForm_EgressNode">
+                    <option value="-1">--Seleccionar--</option>
+                  </select>
+                  <small id="addServiceForm_EgressNode_validate" class="error" style="display: none">Invalid entry</small>
+                </div>
+              </div>
+              <div class="large-5 columns end">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Interfaz</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="addServiceForm_EgressInterface" name="addServiceForm_EgressInterface"></select>
+                </div>
+              </div>
+            </div>
+
+            <!--
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto entrada
+                  <select>
+                    <option id="addServiceForm_switchPortIn" name="addServiceForm_switchPortIn" value="husker">Husker</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto entrada (fisico)
+                  <select>
+                    <option id="addServiceForm_physicalSwitchPortIn" name="addServiceForm_physicalSwitchPortIn" value="husker">Husker</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            -->
+            <br />
+            <p>Tipo de VPN</p>
+            <div class="row">
+              <div class="large-8 columns end">
+                <label>
+                      <br /><br />
+                      <div class="switch small" style="float: left; width: auto; margin-right: 40px">
+                        <span class="switch-span">Capa 3</span>
+                        <input id="addServiceForm_VPN3" type="radio" checked name="serviceGroup">
+                        <label for="addServiceForm_VPN3"></label>
+                      </div> 
+
+                      <div class="switch small">
+                        <span class="switch-span">Capa 2</span>
+                        <input id="addServiceForm_VPN2" type="radio" name="serviceGroup">
+                        <label for="addServiceForm_VPN2"></label>
+                      </div> 
+
+                </label>
+              </div>
+            </div>
+
+            <br />
+            <p>Capa 2</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion MAC origen
+                  <input id="addServiceForm_etherSrc" name="addServiceForm_etherSrc" type="text" placeholder="ab:cd:ef:gh:ij:kl" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion MAC destino
+                  <input id="addServiceForm_etherDst" name="addServiceForm_etherDst" type="text" placeholder="ab:cd:ef:gh:ij:kl" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Ethertype
+                  <input id="addServiceForm_Ethertype" name="addServiceForm_Ethertype" type="text" placeholder="0x080" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Identificador de VLAN
+                  <input id="addServiceForm_vlanID" name="addServiceForm_vlanID" type="text" placeholder="Range: 0 - 4095" /> 
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Prioridad de VLAN
+                  <input id="addServiceForm_vlanPCP" name="addServiceForm_vlanPCP" type="text" placeholder="Range: 0 - 7" /> 
+                </label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ARP spa
+                  <input id="addServiceForm_ARPspa" name="addServiceForm_ARPspa" type="text" placeholder="192.168.1.1" /> 
+                </label>
+              </div>
+            </div>
+
+
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ARP tpa
+                  <input id="addServiceForm_ARPtpa" name="addServiceForm_ARPtpa" type="text" placeholder="192.168.1.1" /> 
+                </label>
+              </div>
+            </div>
+
+            <p>Capa 3</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo IP
+                 <select id="addServiceForm_IPProtocol" name="addServiceForm_IPProtocol">
+                    <option  value="0">IPv4</option>
+                    <option  value="1">IPv6</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion origen
+                  <input id="addServiceForm_ipSrc" name="addServiceForm_ipSrc" type="text" placeholder="192.168.1.1" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion destino
+                  <input id="addServiceForm_ipDst" name="addServiceForm_ipDst" type="text" placeholder="192.168.1.2" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo ICMP
+                 <select id="addServiceForm_ICMPProtocol" name="addServiceForm_ICMPProtocol">
+                    <option  value="0">ICMPv4</option>
+                    <option  value="1">ICMPv6</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Code
+                  <input id="addServiceForm_icmpCode" name="addServiceForm_icmpCode" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Type
+                  <input id="addServiceForm_icmpType" name="addServiceForm_icmpType" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <!--
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv4 origen
+                  <input id="addServiceForm_ipv4Src" name="addServiceForm_ipv4Src" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv4 destino
+                  <input id="addServiceForm_ipv4Dst" name="addServiceForm_ipv4Dst" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv6 origen
+                  <input id="addServiceForm_ipv6Src" name="addServiceForm_ipv6Src" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv6 destino
+                  <input id="addServiceForm_ipv6Dst" name="addServiceForm_ipv6Dst" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv4 type
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv4 code
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+             <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv6 type
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv6 code
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+          -->
+
+            <p>Capa 4</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo
+                  <select id="addServiceForm_layer4Protocol" name="addServiceForm_layer4Protocol">
+                    <option value="0">TCP</option>
+                    <option value="1">UDP</option>
+                    <option value="2">SCTP</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto origen
+                  <input id="addServiceForm_layerSrcPort" name="addServiceForm_layerSrcPort" type="text" placeholder="Range: 0 - 65535" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto destino
+                  <input id="addServiceForm_layerDstPort" name="addServiceForm_layerDstPort" type="text" placeholder="Range: 0 - 65535" />
+                </label>
+              </div>
+            </div>
+            
+            
+          </div>
+          <hr></hr>
+          <div class="row" align="center">
+            <a id="addServiceForm_SubmitButton" name="addServiceForm_SubmitButton" href="#" class="button small success">Agregar</a>
+          </div>
+        
+      </form>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <!-- Service Update Modal -->
+    <div id="serviceUpdateModal" class="reveal-modal medium" data-reveal aria-labelledby="" aria-hidden="true">
+      <h3 id="">Modificar servicio</h3>
+      <hr></hr>
+      <form id="updateServiceForm" class="smoothForm" name="updateServiceForm">
+
+          <div style="width:100%; height: 300px; overflow-y: scroll">
+            <div class="row" style="display: none">
+                <div class="large-8 columns end">
+                  <label>ID
+                      <input id="updateServiceForm_serviceID" name="updateServiceForm_serviceID" type="text" placeholder="" />
+                  </label>
+                </div>
+            </div>
+            <div class="row">
+              <div class="large-8 columns end">
+                <label>Nombre del Servicio
+                    <input id="updateServiceForm_serviceName" name="updateServiceForm_serviceName" type="text" placeholder="Nombre del Servicio" />
+                </label>
+              </div>
+              <div class="large-2 columns end">
+                <label>Color
+                   #<input type="text" id="updateServiceForm_serviceColorPicker" placeholder="FFFFFF"></input> 
+                </label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="large-12 columns">
+                <span class="span-1">Nodo de ingreso</span>
+              </div> 
+              <div class="large-5 columns">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Nodo</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="updateServiceForm_IngressNode" name="updateServiceForm_IngressNode"></select>
+                </div>
+              </div>
+              <div class="large-5 columns end">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Interfaz</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="updateServiceForm_IngressInterface" name="updateServiceForm_IngressInterface"></select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="large-12 columns">
+                <span class="span-1">Nodo de egreso</span>
+              </div>
+              <div class="large-5 columns">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Nodo</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="updateServiceForm_EgressNode" name="updateServiceForm_EgressNode"></select>
+                </div>
+              </div>
+              <div class="large-5 columns end">
+                <div class="small-4 columns" align="left">
+                   <label for="left-label" class="left inline">Interfaz</label>
+                </div>
+                <div class="small-8 columns">
+                  <select id="updateServiceForm_EgressInterface" name="updateServiceForm_EgressInterface"></select>
+                </div>
+              </div>
+            </div>
+
+            <!--
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto entrada
+                  <select>
+                    <option id="addServiceForm_switchPortIn" name="addServiceForm_switchPortIn" value="husker">Husker</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto entrada (fisico)
+                  <select>
+                    <option id="addServiceForm_physicalSwitchPortIn" name="addServiceForm_physicalSwitchPortIn" value="husker">Husker</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            -->
+            <p>Capa 2</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion MAC origen
+                  <input id="updateServiceForm_etherSrc" name="updateServiceForm_etherSrc" type="text" placeholder="ab:cd:ef:gh:ij:kl" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion MAC destino
+                  <input id="updateServiceForm_etherDst" name="updateServiceForm_etherDst" type="text" placeholder="ab:cd:ef:gh:ij:kl" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Ethertype
+                  <input id="updateServiceForm_Ethertype" name="updateServiceForm_Ethertype" type="text" placeholder="0x080" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Identificador de VLAN
+                  <input id="updateServiceForm_vlanID" name="updateServiceForm_vlanID" type="text" placeholder="Range: 0 - 4095" /> 
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Prioridad de VLAN
+                  <input id="updateServiceForm_vlanPCP" name="updateServiceForm_vlanPCP" type="text" placeholder="Range: 0 - 7" /> 
+                </label>
+              </div>
+            </div>
+
+            <p>Capa 3</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo IP
+                 <select id="updateServiceForm_IPProtocol" name="updateServiceForm_IPProtocol">
+                    <option  value="0">IPv4</option>
+                    <option  value="1">IPv6</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion origen
+                  <input id="updateServiceForm_ipSrc" name="updateServiceForm_ipSrc" type="text" placeholder="192.168.1.1" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion destino
+                  <input id="updateServiceForm_ipDst" name="updateServiceForm_ipDst" type="text" placeholder="192.168.1.2" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo ICMP
+                 <select id="updateServiceForm_ICMPProtocol" name="updateServiceForm_ICMPProtocol">
+                    <option  value="0">ICMPv4</option>
+                    <option  value="1">ICMPv6</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Code
+                  <input id="updateServiceForm_icmpCode" name="updateServiceForm_icmpCode" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Type
+                  <input id="updateServiceForm_icmpType" name="updateServiceForm_icmpType" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <!--
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv4 origen
+                  <input id="addServiceForm_ipv4Src" name="addServiceForm_ipv4Src" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv4 destino
+                  <input id="addServiceForm_ipv4Dst" name="addServiceForm_ipv4Dst" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv6 origen
+                  <input id="addServiceForm_ipv6Src" name="addServiceForm_ipv6Src" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion IPv6 destino
+                  <input id="addServiceForm_ipv6Dst" name="addServiceForm_ipv6Dst" type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv4 type
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv4 code
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+             <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv6 type
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>ICMPv6 code
+                  <input type="text" placeholder="large-12.columns" />
+                </label>
+              </div>
+            </div>
+          -->
+
+            <p>Capa 4</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo
+                  <select id="updateServiceForm_layer4Protocol" name="updateServiceForm_layer4Protocol">
+                    <option value="0">TCP</option>
+                    <option value="1">UDP</option>
+                    <option value="2">SCTP</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto origen
+                  <input id="updateServiceForm_layerSrcPort" name="updateServiceForm_layerSrcPort" type="text" placeholder="Range: 0 - 65535" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto destino
+                  <input id="updateServiceForm_layerDstPort" name="updateServiceForm_layerDstPort" type="text" placeholder="Range: 0 - 65535" />
+                </label>
+              </div>
+            </div>
+            
+            
+          </div>
+          <hr></hr>
+          <div class="row" align="center">
+            <a id="updateServiceForm_SubmitButton" name="updateServiceForm_SubmitButton" href="#" class="button small success">Guardar</a>
+          </div>
+        
+      </form>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <!-- Service Expand data Modal -->
+    <div id="serviceExpandModal" class="reveal-modal medium" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true">
+      <h3 id="firstModalTitle">Servicio</h3>
+      <hr></hr>
+      <form id="addServiceForm" class="smoothForm" name="addServiceModal">
+
+          <div style="width:100%; height: 300px; overflow-y: scroll">
+            <div class="row">
+              <div class="large-12 columns">
+                <span class="span1">Nombre del Servicio:</span>
+                <p id="expandService_serviceName" name="expandService_serviceName"></p>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="large-12 columns">
+                <span class="span-2">Nodo de ingreso</span>
+                <div class="large-5 columns">
+                  <div class="small-4 columns" align="left">
+                     <span class="span1">Nodo:</span>
+                  </div>
+                  <div class="small-8 columns">
+                    <p id="expandService_IngressNode" name="expandService_IngressNode"></p>
+                  </div>
+                </div>
+                <div class="large-5 columns end">
+                  <div class="small-4 columns" align="left">
+                     <span class="span1">Interfaz:</span>
+                  </div>
+                  <div class="small-8 columns">
+                    <p id="expandService_IngressInterface" name="expandService_IngressInterface"></p>
+                  </div>
+                 </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="large-12 columns">
+                <span class="span-2">Nodo de egreso</span>
+                <div class="large-5 columns">
+                  <div class="small-4 columns">
+                     <span class="span1">Nodo:</span>
+                  </div>
+                  <div class="small-8 columns">
+                    <p id="expandService_EgressNode" name="expandService_EgressNode"></p>
+                  </div>
+                </div>
+                <div class="large-5 columns end">
+                  <div class="small-4 columns">
+                     <span class="span1">Interfaz:</span>
+                  </div>
+                  <div class="small-8 columns">
+                    <p id="expandService_EgressInterface" name="expandService_EgressInterface"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p>Capa 2</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <span class="span1">Direccion MAC origen:</span>
+                <p id="expandService_etherSrc" name="expandService_etherSrc"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <span class="span1">Direccion MAC destino:</span>
+                <p id="expandService_etherDst" name="expandService_etherDst"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Ethertype:</label>
+                <p id="expandService_Ethertype" name="expandService_Ethertype"/></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Identificador de VLAN:</label>
+                <p id="expandService_vlanID" name="expandService_vlanID"></p> 
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Prioridad de VLAN:</label>
+                <p id="expandService_vlanPCP" name="expandService_vlanPCP"></p> 
+              </div>
+            </div>
+
+            <p>Capa 3</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo IP:
+                 <p id="expandService_ipProtocol" name="expandService_ipProtocol"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion origen:</label>
+                <p id="expandService_ipSrc" name="expandService_ipSrc"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Direccion destino:</label>
+                <p id="expandService_ipDst" name="expandService_ipDst"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo ICMP:
+                <p id="expandService_ICMPProtocol" name="expandService_ICMPProtocol"></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Code:</label>
+                <p id="expandService_icmpCode" name="expandService_icmpCode"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Type:</label>
+                <p id="expandService_icmpType" name="expandService_icmpType"></p>
+              </div>
+            </div>
+
+            <p>Capa 4</p>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Protocolo:</label>
+                <p id="expandService_layer4Protocol" name="expandService_layer4Protocol"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto origen:</label>
+                <p id="expandService_layer4SrcPort" name="expandService_layer4SrcPort"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>Puerto destino:</label>
+                <p id="expandService_layer4DstPort" name="expandService_layer4DstPort"></p>
+              </div>
+            </div>
+            
+            
+          </div>
+          <hr></hr>
+          <div class="row" align="center">
+            <a id="expandService_CloseButton" name="expandService_CloseButton" href="#" class="button small success">Cerrar</a>
+          </div>
+        
+      </form>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <!-- TopologyView-Service selector-->
+    <div id="topologyViewServiceRenderSelector" class="reveal-modal medium" data-reveal aria-labelledby="" aria-hidden="true">
+      <h4 id="topologyViewServiceRenderSelectorTitle">Indique los servicios que desea visualizar</h4>
+      <hr></hr>
+      <form id="topologyViewServiceRenderSelectorForm" class="smoothForm" name="topologyViewServiceRenderSelectorForm">
+
+          <div style="height:150px; width:100%; overflow-y: scroll; margin-bottom: 20px">
+            <table width="100%" > 
+              <thead> 
+                <tr> 
+                  <th width="30%">Servicio</th>
+                  <th width="12%">Ndo. ingreso</th>
+                  <th width="12%">Ndo. egreso</th>
+                  <th width="12%">Int. ingreso</th>
+                  <th width="12%">Int. egreso</th> 
+                  <th width="10%">Seleccion</th> 
+                </tr> 
+              </thead> 
+              <tbody id="TabTopologyServiceRenderSelectorTable"></tbody> 
+            </table>
+          </div>
+
+          <div class="row" align="center">
+            <ul class="button-group center">
+                <li><a href="#" id="topologyViewServiceRenderConfirmButton" class="button">Confirmar</a></li>
+                <li><a href="#" id="topologyViewServiceRenderCancelButton" class="button">Cancelar</a></li>
+            </ul>
+          </div>
+
+      </form>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <!-- Confog- Node editable attributes-->
+    <div id="configTabNodesSubTabEdit" class="reveal-modal medium" data-reveal aria-labelledby="" aria-hidden="true">
+      <h4 id="configTabNodesSubTabEditTitle">Editar infiormacion de Nodo</h4>
+      <hr></hr>
+      <form id="configTabNodesSubTabEditForm" class="smoothForm" name="configTabNodesSubTabEditForm">
+
+          <div style="height:170px; width:100%; overflow-y: scroll; margin-bottom: 20px">
+            <div class="row">
+              <div class="large-8 columns end">
+                <label>Nombre
+                    <input id="configTabNodesSubTabEditForm_nodeName" name="configTabNodesSubTabEditForm_nodeName" type="text" placeholder="Nombre del Servicio" />
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-8 columns end">
+                <label>Tipo de Nodo
+                      <br /><br />
+                      <div class="switch small" style="float: left; width: auto; margin-right: 40px">
+                        <span class="switch-span">Borde</span>
+                        <input id="configTabNodesSubTabEditForm_nodeTopType1" type="radio" checked name="testGroup">
+                        <label for="configTabNodesSubTabEditForm_nodeTopType1"></label>
+                      </div> 
+
+                      <div class="switch small">
+                        <span class="switch-span">Core</span>
+                        <input id="configTabNodesSubTabEditForm_nodeTopType2" type="radio" name="testGroup">
+                        <label for="configTabNodesSubTabEditForm_nodeTopType2"></label>
+                      </div> 
+
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" align="center">
+            <ul class="button-group center">
+                <li><a href="#" id="configTabNodesSubTabEditFormConfirmButton" class="button">Confirmar</a></li>
+                <li><a href="#" id="configTabNodesSubTabEditFormCancelButton" class="button">Cancelar</a></li>
+            </ul>
+          </div>
+
+      </form>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <!-- Confog- Node Interface editable attributes-->
+    <div id="configTabInterfaceSubTabEdit" class="reveal-modal medium" data-reveal aria-labelledby="" aria-hidden="true">
+      <h4 id="configTabInterfaceSubTabEditTitle">Editar infiormacion de interfaz</h4>
+      <hr></hr>
+      <form id="configTabInterfaceSubTabEditForm" class="smoothForm" name="configTabInterfaceSubTabEditForm">
+
+          <div style="height:170px; width:100%; overflow-y: scroll; margin-bottom: 20px">
+            <div class="row">
+              <div class="large-8 columns end">
+                <label>Tipo de Interfaz
+                      <br /><br />
+                      <div class="switch small" style="float: left; width: auto; margin-right: 40px">
+                        <span class="switch-span">Externa</span>
+                        <input id="configTabInterfaceSubTabEditForm_ifaceTopType1" type="radio" checked name="testGroup">
+                        <label for="configTabInterfaceSubTabEditForm_ifaceTopType1"></label>
+                      </div> 
+
+                      <div class="switch small">
+                        <span class="switch-span">Interna</span>
+                        <input id="configTabInterfaceSubTabEditForm_ifaceTopType2" type="radio" name="testGroup">
+                        <label for="configTabInterfaceSubTabEditForm_ifaceTopType2"></label>
+                      </div> 
+
+                </label>
+              </div>
+            </div>
+            <br />
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>CE Direccion IP
+                    <input id="configTabInterfaceSubTabEditForm_ifaceCEIpAddress" type="text" name="configTabInterfaceSubTabEditForm_ifaceCEIpAddress" placeholder="192.168.1.1"/>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="large-4 columns end">
+                <label>CE Direccion MAC
+                    <input id="configTabInterfaceSubTabEditForm_ifaceCEMacAddress" type="text" name="configTabInterfaceSubTabEditForm_ifaceCEMacAddress" placeholder="FF:FF:FF:FF:FF:FF"/>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" align="center">
+            <ul class="button-group center">
+                <li><a href="#" id="configTabNodesInterfaceSubTabEditFormConfirmButton" class="button">Confirmar</a></li>
+                <li><a href="#" id="configTabNodesInterfaceSubTabEditFormCancelmButton" class="button">Cancelar</a></li>
+            </ul>
+          </div>
+
+      </form>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <!-- Confirmaciones -->
+    <div id="serviceDeleteConfirmModal" class="reveal-modal small" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true">
+      <h4 id="serviceDeleteConfirmModalTitle">Estas seguro que deseas eliminar el servicio?</h4>
+
+      <form id="deleteServiceForm" class="smoothForm" name="deleteServiceForm">
+
+         <div class="row" align="center">
+            <ul class="button-group center">
+                <li><a href="#" id="deleteServiceConfirmButton" class="button">Confirmar</a></li>
+                <li><a href="#" id="deleteServiceCancelButton" class="button">Cancelar</a></li>
+            </ul>
+          </div>
+
+      </form>
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <!-- Errores -->
+    <div id="errorModal" class="reveal-modal small" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true">
+      <div align="center">
+        <h4 id="errorModal_Message"></h4>
+
+          <br />
+          <ul class="button-group center">
+              <li><a href="#" id="errorModal_closeButton" class="small button">Cerrar</a></li>
+          </ul>
+        </div>
+          
+      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <script src="foundation-5.5.1/js/vendor/jquery.js"></script>
+    <script src="foundation-5.5.1/js/foundation.min.js"></script>
+    <script>
+      $(document).foundation();
+    </script>
+
+    <script src="ryu-topology/ryu.topology.js" charset="utf-8"></script>
+
+    <!-- -->
+    <script src="js/server.js"></script>
+
+    <style>
+      .span-1{
+        clear: both;
+        display: block;
+        color: rgba(0, 0, 0, .4) !important;
+        margin: 0px 0px 10px 0px;
+        font-size: 0.875rem;
+        -webkit-font-smoothing: antialiased;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
+      }
+      .span1{
+        webkit-font-smoothing: antialiased;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
+
+        font-size: 0.875rem;
+        color: #4d4d4d;
+        display: block;
+        font-weight: normal;
+        line-height: 1.5;
+        margin: 0.15rem 0 0.45rem 0 !important;   
+      }
+      .span-2{
+        clear: both;
+        display: block;
+        color: rgba(0, 0, 0, .4) !important;
+        margin: 0px 0px 0px 0px;
+        font-size: 0.875rem;
+        -webkit-font-smoothing: antialiased;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.004);  
+      }
+      .smoothForm label{
+        -webkit-font-smoothing: antialiased;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.004);  
+      }
+      .smoothForm p{
+        color: #4d4d4d;
+        margin: 0.15rem 0 0.15rem 0 !important;
+        font-size: 0.875rem !important; 
+      }
+    </style>
+
+    <script>
+      $(document).ready(function(){
+
+        var width = $('#optionsBar').width();
+        var navar_width = $(window).width() - width;
+        $('#topoTabTopBar').css({'left': width, 'width': navar_width});
+        
+        $('#Tabs').css({'height': $('#optionsBar').height()- 45 - 1});
+
+        var activeTab = 1;
+        $('.icon-bar .item').click(function(){
+            $('#tab-'+activeTab).hide();      
+            id = $(this).attr('id').split("-")[1];
+            $('#tab-'+id).show();
+            $('#tab-'+id).prop('active');
+            activeTab = id; 
+            
+            switch(parseInt(id)){
+              case 1: loadDevicesTabData();
+                      $('#topoTabTopBar').show(); 
+                break;
+              case 2: 
+                      $('#topoTabTopBar').hide();
+                break; 
+              case 3: loadConfigTabData();
+                      $('#topoTabTopBar').hide();
+                      break;
+            }       
+        })
+      });
+    </script>
+
+    <script src="js/colpick.js" type="text/javascript"></script>
+    <script src="js/jquery.color.js" charset="text/javascript"></script>
+    <script src="js/color_mixer.js" charset="text/javascript"></script>
+
+    <script>
+            $('#addServiceForm_serviceColorPicker').colpick({
+                layout:'hex',
+                submit:0,
+                colorScheme:'dark',
+                onChange:function(hsb,hex,rgb,el,bySetColor) {
+                  $(el).css('border-color','#'+hex);
+                  // Fill the text box just if the color was set using the picker, and not the colpickSetColor function.
+                  if(!bySetColor) $(el).val(hex);
+                }
+              }).keyup(function(){
+                $(this).colpickSetColor(this.value);
+              });
+              $('#updateServiceForm_serviceColorPicker').colpick({
+                layout:'hex',
+                submit:0,
+                colorScheme:'dark',
+                onChange:function(hsb,hex,rgb,el,bySetColor) {
+                  $(el).css('border-color','#'+hex);
+                  // Fill the text box just if the color was set using the picker, and not the colpickSetColor function.
+                  if(!bySetColor) $(el).val(hex);
+                }
+              }).keyup(function(){
+                $(this).colpickSetColor(this.value);
+              });
+    </script>
+
+    <style>
+      #addServiceForm_serviceColorPicker, #updateServiceForm_serviceColorPicker{
+        margin:0;
+        padding:0;
+        border:0;
+        border-right:25px solid;
+        line-height:20px;
+      }
+    </style>
+  </body>
+</html>
