@@ -216,8 +216,6 @@ def JSONToDTService(service):
 
     data = json.loads(service)
 
-    print data 
-
     ID = data['ID']
     name = data['service_name']
     color = data['service_color']
@@ -360,9 +358,6 @@ def increment_hex_value(value):
 def string_to_hexa(value):
     return int(value, 16)
 
-
-
-
 def get_nodes_min_cost_link(a, b):
     '''
     We asume that exist link between a and b
@@ -427,7 +422,6 @@ def MultiDijkstra(G, start, end):
             print 'start: ' + str(start.router_id) + ', end: ' + str(i.router_id)
             link = get_nodes_min_cost_link(start, i)
             D[i] = link.weight
-            #P[i.router_id] = {'node': start, 'interface': link.from_node_int}
             P[i] = link
         else:
             D[i] = -1
@@ -451,7 +445,6 @@ def MultiDijkstra(G, start, end):
                 print 'v='+ str(v.router_id) + ', D[w]=' + str(D[w]) + ', l.weight='+ str(l.weight) + ', D[v]=' + str(D[v])
 
                 D[v] = D[w] + l.weight
-                #P[v.router_id] = {'node': w, 'interface': link.from_node_int}
                 P[v] = l
 
     return (D,P)

@@ -14,7 +14,7 @@ HOST = '192.168.1.12'
 PORT = '5000'
 URI_APP_SNMP = 'http://' + HOST + ':' + PORT + '/snmp/atp/' 
 
-class ManagementApp(Singleton, object):
+class SNMPAgents(Singleton, object):
 	'''
 	classdocs
 	'''

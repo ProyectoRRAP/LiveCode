@@ -12,7 +12,7 @@ UINT64_MAX = 0xffffffffffffffff
 class Address(object):
     def __init__(self, nw_addr, netmask, default_gw):
         super(Address, self).__init__()
-        #self.address_id = address_id
+
         self.nw_addr = nw_addr
         self.netmask = netmask
         self.default_gw = default_gw
@@ -23,9 +23,6 @@ class Address(object):
 def string_to_ip_address(self, address):
     err_msg = 'Invalid [%s] value.' % REST_ADDRESS
     nw_addr, mask, default_gw = nw_addr_aton(address, err_msg=err_msg)
-
-    #address = Address(self.address_id, nw_addr, mask, default_gw)
-    #ip_str = ip_addr_ntoa(nw_addr)
 
 def nw_addr_aton(nw_addr, err_msg=None):
     ip_mask = nw_addr.split('/')

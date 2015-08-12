@@ -4,8 +4,6 @@ Created on March 5, 2015
 @author: efviodo
 '''
 
-
-
 class Singleton(object):
   _instance = None
   def __new__(class_, *args, **kwargs):

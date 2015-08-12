@@ -14,16 +14,9 @@ def install_ingress_node_flow_for_service(service, node, ovs_port_in, ovs_port_o
     nivel en el nodo de ingreso utilizando dos tablas en el dispositivo para ello
     '''
 
-    #print 'Servicio (' + service.ingress_node.router_id + ', '+ service.egress_node.router_id + ')'
-    print 'Instala flujos en nodos de borde'
-    print 'Puerto entrada ' +  str(ovs_port_in)
-    print 'Puerto salida ' + str(ovs_port_out)
-    print 'Node ' + node.router_id
-
-    print 'accion'
-    print action
-    print 'label in'
-    print label_in
+    print 'Install ingress node flow: ' + str(node.router_id)
+    print '- Input port:  ' +  str(ovs_port_in)
+    print '- Output port: ' + str(ovs_port_out)
 
     #Check if node is OF type and the state is OF functional
     if node.net_type == 1 and node.of_ready:
@@ -68,7 +61,6 @@ def install_ingress_node_flow_for_service(service, node, ovs_port_in, ovs_port_o
 
                     inst = [parser.OFPInstructionGotoTable(table_id_2)]
                     add_flow(datapath=datapath, priority=0, match=match, actions=actions, tableid=table_id_1, inst=inst)
-
 
                     # ----- Built Second Flow --> Flow asociated to Copy TTL from IP to MPLS header and second label level PUSH
                     match = parser.OFPMatch()
@@ -139,10 +131,10 @@ def install_ingress_node_flow_for_service(service, node, ovs_port_in, ovs_port_o
 
                 actions = []
             
+                # Since OvS does not support yet CopyTTLOut we define static TTL for mpls core packets
                 #if service.eth_type == '0x0800':
                     #Copy TTL from IPv4 header to MPLS header
                     #actions.append(parser.OFPActionCopyTtlOut())
-
                
                 #Specify MPLS label manipulation
                 if action is not None:
@@ -159,43 +151,16 @@ def install_ingress_node_flow_for_service(service, node, ovs_port_in, ovs_port_o
                 if ovs_port_out is not None:
                     actions.append(parser.OFPActionOutput(int(ovs_port_out)))
 
-                #inst = [parser.OFPInstructionGotoTable(table_id_3)]
-
                 add_flow(datapath=datapath, priority=0, match=match, actions=actions, tableid=table_id_2)
-
-            # ----- Built Third Flow --> Flow asociated to forwarding Rule
-            #match = parser.OFPMatch()
-            #match.set_dl_type(0x8847)
-
-            #f ovs_port_in is not None:
-            #    match.set_in_port(int(ovs_port_in))
-            
-            #match.set_mpls_label(int(action.label, 16))
-
-            #actions = []
-            #actions.append(parser.OFPActionDecMplsTtl())
-
-            #Specify forwarding 
-            #if ovs_port_out is not None:
-            #    actions.append(parser.OFPActionOutput(int(ovs_port_out)))
-
-            #add_flow(datapath=datapath, priority=0, match=match, actions=actions, tableid=table_id_3)
 
 def install_egress_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, label_in, action, interface=None):
     '''
-
+    Docs    
     '''
-    print 'Install node egress flow'
 
-    print 'Instala flujos en nodos de borde'
-    print 'Puerto entrada ' +  str(ovs_port_in)
-    print 'Puerto salida ' + str(ovs_port_out)
-    print 'Node ' + node.router_id
-
-    print 'accion'
-    print action
-    print 'label in'
-    print label_in
+    print 'Install ingress node flow: ' + str(node.router_id)
+    print '- Input port:  ' +  str(ovs_port_in)
+    print '- Output port: ' + str(ovs_port_out)
 
     #Check if node is OF type and the state is OF functional
     if node.net_type == 1 and node.of_ready:
@@ -279,15 +244,9 @@ def install_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, labe
 
     '''
 
-    #print 'Servicio (' + service.ingress_node.router_id + ', '+ service.egress_node.router_id + ')'
-    print 'Puerto entrada ' +  str(ovs_port_in)
-    print 'Puerto salida ' + str(ovs_port_out)
-    print 'Node ' + node.router_id
-
-    print 'accion'
-    print action
-    print 'label in'
-    print label_in
+    print 'Install ingress node flow: ' + str(node.router_id)
+    print '- Input port:  ' +  str(ovs_port_in)
+    print '- Output port: ' + str(ovs_port_out)
 
     #Check if node is OF type and the state is OF functional
     if node.net_type == 1 and node.of_ready:
@@ -299,7 +258,6 @@ def install_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, labe
         parser = datapath.ofproto_parser
 
         #Built OF match field
-        #match = get_of_match_field(ofparser=parser, s=service)
         match = parser.OFPMatch()
 
         #Modify specific match fields
@@ -310,7 +268,6 @@ def install_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, labe
             match.set_mpls_label(int(label_in, 16))
         
         match.set_dl_type(0x8847)
-
         match.set_mpls_bos(0)
 
         #Specify actions
@@ -331,7 +288,6 @@ def install_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, labe
         #Specify forwarding 
         if ovs_port_out is not None:
             actions.append(parser.OFPActionOutput(int(ovs_port_out)))
-            print 'accion de salida'
 
         inst = []
     
@@ -342,13 +298,9 @@ def remove_egress_node_flow_for_service(service, node, ovs_port_in, ovs_port_out
     docs
     '''
 
-    print 'Remueve flujo en nodo de borde'
-    print 'Puerto entrada ' +  str(ovs_port_in)
-    print 'Puerto salida ' + str(ovs_port_out)
-    print 'Node ' + node.router_id
-
-    print 'service label'
-    print service.label
+    print 'Remove egress node flow: ' + str(node.router_id)
+    print '- Input port:  ' +  str(ovs_port_in)
+    print '- Output port: ' + str(ovs_port_out)
 
     #Check if node is OF type and the state is OF functional
     if node.net_type == 1 and node.of_ready:
@@ -367,7 +319,6 @@ def remove_egress_node_flow_for_service(service, node, ovs_port_in, ovs_port_out
             for eth, l in service.labels.iteritems():
                 match = parser.OFPMatch()
 
-                print 'entro papa'
                 #Modify specific match fieldsinstall_node_flow_for_service
                 if ovs_port_in is not None:
                     match.set_in_port(int(ovs_port_in))
@@ -396,19 +347,14 @@ def remove_egress_node_flow_for_service(service, node, ovs_port_in, ovs_port_out
 
             del_flow(datapath=datapath, tableid=table_id, match=match)
 
-
 def remove_ingress_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, label_in, path_len):
     '''
     docs
     '''
 
-    print 'Remueve flujo de entrada'
-    print 'Puerto entrada ' +  str(ovs_port_in)
-    print 'Puerto salida ' + str(ovs_port_out)
-    print 'Node ' + node.router_id
-
-    print 'service label'
-    print service.label
+    print 'Remove ingress node flow: ' + str(node.router_id)
+    print '- Input port:  ' +  str(ovs_port_in)
+    print '- Output port: ' + str(ovs_port_out)
 
     #Check if node is OF type and the state is OF functional
     if node.net_type == 1 and node.of_ready:
@@ -478,13 +424,10 @@ def remove_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, label
     docs
     '''
 
-    print 'Remueve flujo en nodo de core'
-    print 'Puerto entrada ' +  str(ovs_port_in)
-    print 'Puerto salida ' + str(ovs_port_out)
-    print 'Node ' + node.router_id
 
-    print 'label in'
-    print label_in
+    print 'Remove node flow: ' + str(node.router_id)
+    print '- Input port:  ' +  str(ovs_port_in)
+    print '- Output port: ' + str(ovs_port_out)
 
     #Check if node is OF type and the state is OF functional
     if node.net_type == 1 and node.of_ready:
@@ -496,11 +439,8 @@ def remove_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, label
         parser = datapath.ofproto_parser
 
         #Built OF match field
-        #match = get_of_match_field(parser, service)
         match = parser.OFPMatch()
-
         match.set_dl_type(0x8847)
-
         match.set_mpls_bos(0)
         
         #Modify specific match fieldsinstall_node_flow_for_service
@@ -509,24 +449,6 @@ def remove_node_flow_for_service(service, node, ovs_port_in, ovs_port_out, label
         
         if label_in is not None:
             match.set_mpls_label(int(label_in, 16))
-
-        #Specify actions
-        #actions = []
-
-        #Specify forwarding 
-        #actions.append(parser.OFPActionOutput(ovs_port_out))
-    
-        #Specify MPLS label manipulation
-        #if action is not None:
-         #   if action.isPUSH():
-         #       actions.append(parser.OFPActionPushMpls(0x8847))
-         #       actions.append(parser.OFPActionSetField(mpls_label=action.label))
-         #   elif action.isPOP():
-         #       actions.append(parser.OFPActionPopMpls(0x8847))
-         #   else:
-         #       actions.append(parser.OFPActionSetField(mpls_label=action.label))
-
-        #inst = []
     
         del_flow(datapath=datapath, tableid=0, match=match)
 
@@ -571,17 +493,12 @@ def get_of_match_field(ofparser, s):
         match.set_ip_proto(int(s.IP_proto, 16))
 
     if s.IPv4_src is not None:
-        print 'Parsea direccion IP'
         ip_src, ip_mask_src = stringToIPAddress(s.IPv4_src)
         match.set_ipv4_src_masked(ip_src, ip_mask_src)
-        #match.set_ipv4_src(ip_src)
-        print ip_src
-        print ip_mask_src
 
     if s.IPv4_dst is not None:
         ip_dst, ip_mask_dst = stringToIPAddress(s.IPv4_dst)
         match.set_ipv4_dst_masked(ip_dst, ip_mask_dst)
-        #match.set_ipv4_dst(s.IPv4_dst)
 
     if s.TCP_src is not None:
         match.set_tcp_src(int(s.TCP_src))
@@ -611,12 +528,10 @@ def get_of_match_field(ofparser, s):
         match.set_arp_opcode(s.ARP_op)
 
     if s.ARP_spa is not None:
-        #match.set_arp_spa(s.ARP_spa)
         arp_spa, arp_mask_src = stringToIPAddress(s.ARP_spa)
         match.set_arp_spa_masked(arp_spa, arp_mask_src)
 
     if s.ARP_tpa is not None:
-        #match.set_arp_tpa(s.ARP_tpa)
         arp_tpa, arp_mask_dst = stringToIPAddress(s.ARP_tpa)
         match.set_arp_tpa_masked(arp_tpa, arp_mask_dst)
 
@@ -698,11 +613,11 @@ def add_flow(datapath, priority, match, actions, tableid=0, inst=[], buffer_id=N
                         priority=priority, match=match,
                         instructions=inst, command=ofproto.OFPFC_ADD)
     else:
-        print 'Flow sin buffer'
         mod = parser.OFPFlowMod(datapath=datapath, cookie=0, cookie_mask=0, table_id=tableid, command=ofproto.OFPFC_ADD,
                         idle_timeout=0, hard_timeout=0, priority=5, 
                         flags=0, match=match, instructions=inst, out_port=ofproto.OFPP_ANY, out_group=ofproto.OFPG_ANY)
 
+    #Enable to check flows overlap check
     #flags=ofproto.OFPFF_CHECK_OVERLAP  
 
     datapath.send_msg(mod)        
@@ -726,13 +641,12 @@ def del_flow(datapath, match, priority=0, tableid=0, buffer_id=None):
 def send_table_stats_request2(datapath):
     '''
     '''
-    print 'Envia table stats request'
+    print 'Send table stats request'
     ofp = datapath.ofproto
     ofp_parser = datapath.ofproto_parser
 
     cookie = cookie_mask = 0
     match = ofp_parser.OFPMatch()
-    #req = ofp_parser.OFPTableStatsRequest(datapath)
     req = ofp_parser.OFPAggregateStatsRequest(datapath,  0,
                                                       ofp.OFPTT_ALL,
                                                       ofp.OFPP_ANY,

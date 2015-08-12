@@ -14,11 +14,12 @@ from ryu.lib.packet import mpls
 from util import increment_hex_value, shortestPathMultiGraph
 from management_agents import ManagementApp
 from topology import Node, Interface, Link, FTN, NHLFE, ILM
-from dataTypes import DTNode, DTInterface, DTLink, DTLSNode, DTLSInterface, DTLSLink, DTFEC, DTService
+from dataTypes import DTNode, DTInterface, DTLink, DTLSNode, DTLSInterface, DTLSLink, DTService
 from dataTypes import DTLSP, DTMPLSAction, DTNHLFE, DTFTN, DTILM, DTServiceLSP, DTLSPLink
 from patterns import Singleton
 from mpls import Service, PathNode, LSP
 import datapath
+import settings
 
 import copy
 
@@ -56,7 +57,6 @@ class TopologyController(Singleton, object):
         '''
 
         self.mng_app = mngapp
-	#super(TopologyController, self).__init__(*args, **kwargs)
 	
     #######################################################
     ####### TOPOLOGY primitives
@@ -193,10 +193,7 @@ class TopologyController(Singleton, object):
                                         ip_address=i.ip_address, ip_address_dest=l.to_node_int.ip_address, link=l)
                                     print 'Updates link ip_address: ' + l.to_node_int.ip_address
                                 else:
-                                    #new_links.append({'router_id': n.router_id, 'ip_address': i.ip_address, 'link': l})
                                     new_links.append(DTNewLink(n.router_id, i.ip_address, l))
-                                 #   self.add_topology_ls_interface_link(n.router_id, i.ip_address, l)
-                                  #  print 'Creates link ip_address: ' + l.to_node_int.ip_address
                                 
                                 links_chk.append(l.to_node_int.ip_address)
                             
@@ -208,8 +205,6 @@ class TopologyController(Singleton, object):
                                 if l2.to_node_int.ip_address not in links_chk:
                                     self.disable_topology_node_interface_link(node.router_id, 
                                                                               interface.ip_address, l2.to_node_int.ip_address)
-                                    print interface
-                                    #print l
                                     links_disabled.append(l2.toDict())
                                 
                             interfaces_chk.append(i.ip_address)
@@ -260,9 +255,6 @@ class TopologyController(Singleton, object):
         for link in new_links:
             self.add_topology_ls_interface_link(link.router_id, link.ip_address, link.link)
 
-        #If evrething is on right return True
-        #return True
-
         return nodes_disabled, links_disabled
         
     def update_topology_ls_node(self, router_id, node):
@@ -275,13 +267,10 @@ class TopologyController(Singleton, object):
         node_old.router_id = node.router_id
         node_old.status = 1
 
-        ###
-        # Actualiza todas las interfaces externas
-        data = self.mng_app.get_node_full_data(node)
-        
+        # updates all external interfaces
+        data = self.mng_app.get_node_full_data(node)        
         for i in node_old.interfaces.itervalues():
 
-            # Si la interfaz es externa
             if i.type == 1:
 
                 if data.interfaces.has_key(i.ip_address):
@@ -289,8 +278,6 @@ class TopologyController(Singleton, object):
                     i.status = 1
                 else:
                     i.status = 0 
-
-        ###
         
         #Put updated node
         self.nodes[node_old.router_id] = node_old
@@ -333,7 +320,7 @@ class TopologyController(Singleton, object):
             for l in i.links.itervalues():
                 l.status = 0
 
-                #Deshabilita link en el sentido opuesto
+                #Disable oposite link
                 iface = l.to_node_int
                 if iface.links.has_key(l.from_node_int.ip_address):
                     link = iface.links[l.from_node_int.ip_address]
@@ -349,7 +336,7 @@ class TopologyController(Singleton, object):
             #Disable link
             l.status = 0
 
-            #Deshabilita link en el sentido opuesto
+            #Disable oposite link
             iface = l.to_node_int
             if iface.links.has_key(l.from_node_int.ip_address):
                 link = iface.links[l.from_node_int.ip_address]
@@ -378,19 +365,12 @@ class TopologyController(Singleton, object):
 
     def get_best_path(self, node_src, node_dst):
         '''
-        Calcula el mejor camino entre dos nodos en la topologia utilizando el algoritmo
-        que sea necesario
-
+        Calcula el mejor camino entre dos nodos en la topologia 
         el resultado es una lista ordenada de links
-
-        POR AHORA PONEMOS LA RESTRICCION DE QUE TODO NODO DEBE SER OPENFLOW enable
-        ES DECIR TODO NODO TIENE EN TRUE of_ready y ls_ready
         '''
 
         result = []
 
-        ## Por ahora lo hace utilizando una implementacion de ShortestPath con Dijkstra
-        #Construye el multi grafo de adyacencias considerando solamente nodos OpenFlow y puertos OF 
         G = {}
 
         #First built Multi graph with links weight for spf alghoritm 
@@ -475,36 +455,15 @@ class TopologyController(Singleton, object):
     			  datapath_id=data.datapath_id, of_ready=False, ls_ready=True)
 
             #Look datapath cache in case node was register via OF chanell
-            print 'DATAPATH ID En SNMP' + str(data.datapath_id) 
-
             if self.datapath_nodes_cache.has_key(data.datapath_id):
                 n.of_ready = True
                 n.net_type = 1
                 n.datapath = self.datapath_nodes_cache.pop(data.datapath_id)
                 print 'Enables OF Node on Node Add'
 
-            #NO ANDA ESTA MAL SACAR
-            #if data.datapath_id in self.datapath_nodes_cache.keys():
-            #    n.of_ready = True
-            #    n.net_type = 1
-            #    n.datapath = self.datapath_nodes_cache.pop(data.datapath_id)
-            #    print 'Enables OF Node on Node Add2'
-
-
             for i in data.interfaces.itervalues():
                 iface = Interface(node=n, ovs_port=i.ovs_port, ip_address=i.ip_address, 
-                                  mac_address=i.mac_address, status=i.status, i_type=i.type, name=i.name)
-                #Add links
-                
-                #print 'Interfaz ' + i.ip_address + ' cant links ' + str(len(i.links))
-
-                #for l in data.interfaces[i.ip_address].links.itervalues():
-                 #   from_node_int = self.nodes[l.from_node_int.node.router_id].interfaces[l.from_node_int.ip_address]
-                  #  to_node_int = self.nodes[l.to_node_int.node.router_id].interfaces[l.to_node_int.ip_address]
-                   # link = Link(from_node_int=from_node_int, to_node_int=to_node_int, status=1)
-                    #iface.links[l.to_node_int.ip_address] = link
-                    
-                
+                                  mac_address=i.mac_address, status=i.status, i_type=i.type, name=i.name)                    
                 n.add_interface(iface)
             
             self.nodes[data.router_id] = n
@@ -530,7 +489,7 @@ class TopologyController(Singleton, object):
             #Node does not exist, save datapath on cache
             self.datapath_nodes_cache[datapath_id] = datapath
 
-            print 'Node does not exist'
+            print 'Node: ' + str(datapath_id) + ' does not exist on LSDB yet'
             
         else:    
             node.of_ready = state
@@ -539,7 +498,7 @@ class TopologyController(Singleton, object):
             #Update all services LSPs according to node registration
             self.update_services_lsps()
 
-            print 'Node does already exists'
+            print 'Node already exists'
 
         print 'node ' + datapath_id + ' change state to: OF ' + str(state)
 
@@ -570,36 +529,6 @@ class TopologyController(Singleton, object):
 
         return result
 
-    #SACAR
-    # def update_external_interfaces_ls_node(self, n, interfaces_chk):
-    #     '''
-    #     docs
-    #     '''
-        
-    #     #Get node full data including external interfaces
-    #     data = self.mng_app.get_node_full_data(n)
-
-    #     node = self.nodes[n.router_id]
-    #     interfaces = node.interfaces
-    #     if data is not None:
-
-    #         for i in data.interfaces.itervalues():
-
-    #             # Si la interfaz no esta en interfaces_chk entonces es una interfaz externa
-    #             if i.ip_address not in interfaces_chk:
-
-    #                 #Si la interfaz existe la reactiva si no la crea
-    #                 if interfaces.has_key(i.ip_address):
-    #                     # Obtiene la interfaz
-    #                     inter = interfaces[i.ip_address]
-    #                     # La reahabilita
-    #                     inter.status = 1
-    #                 else:
-    #                     iface = Interface(node=n, ovs_port=i.ovs_port, ip_address=i.ip_address, 
-    #                               mac_address=i.mac_address, status=1, i_type=i.type, name=i.name)
-    #                     node.add_interface(iface)
-            
-
     #######################################################
     ####### INTERFACES primitives
     #######################################################
@@ -616,16 +545,7 @@ class TopologyController(Singleton, object):
             #Create the Interface
             iface = Interface(node=node, ovs_port=data.ovs_port, ip_address=data.ip_address, 
                                   mac_address=data.mac_address, status=1, i_type=data.type, name=data.name)
-            
-            #Add links to the Interface
-            # for l in interface.links.itervalues():
-            #     print '/' + l.from_node_int.node.router_id + '/' + l.from_node_int.ip_address           
-            #     from_node_int = self.nodes[l.from_node_int.node.router_id].interfaces[l.from_node_int.ip_address]
-            #     to_node_int = self.nodes[l.to_node_int.node.router_id].interfaces[l.to_node_int.ip_address]
-            #     link = Link(from_node_int=from_node_int, to_node_int=to_node_int, status=1)
-            #     iface.links[l.to_node_int.ip_address] = link
-                
-            
+                            
             #Add Interface to corresponding node
             self.nodes[router_id].interfaces[iface.ip_address] = iface
         
@@ -680,8 +600,6 @@ class TopologyController(Singleton, object):
                 link = Link(from_node_int=from_node_int, to_node_int=to_node_int, status=1, weight=link.weight)
                 self.nodes[router_id].interfaces[ip_address].links[link.to_node_int.ip_address] = link
 
-
-
     #######################################################
     ####### MPLS/LDP primitives
     #######################################################
@@ -730,9 +648,6 @@ class TopologyController(Singleton, object):
         if service.VPN_service_type == 2:
             data.labels = self.get_mpls_labels_for_service_ethertypes(self.mpls_label_sec)
 
-
-        print 'SERVICE LABEL' + str(data.label)
-
         #Creates an LSP for new service
         lsp = self.get_lsp(service=data)
         data.lsps.append(lsp)
@@ -751,94 +666,98 @@ class TopologyController(Singleton, object):
         label = mpls_label_sec
         labels = {}
 
-        labels['0x0800'] = label
-        label = increment_hex_value(label)
-        labels['0x0806']= label
-        label = increment_hex_value(label)
-        labels['0x0842']= label
-        label = increment_hex_value(label)
-        labels['0x22F0']= label
-        label = increment_hex_value(label)
-        labels['0x22F3']= label
-        label = increment_hex_value(label)
-        labels['0x6003']= label
-        label = increment_hex_value(label)
-        labels['0x8035']= label
-        label = increment_hex_value(label)
-        labels['0x809B']= label
-        label = increment_hex_value(label)
-        labels['0x80F3']= label
-        label = increment_hex_value(label)
-        labels['0x8100']= label
-        label = increment_hex_value(label)
-        labels['0x8137']= label
-        label = increment_hex_value(label)
-        labels['0x8138']= label
-        label = increment_hex_value(label)
-        labels['0x8204']= label
-        label = increment_hex_value(label)
-        labels['0x86DD']= label
-        label = increment_hex_value(label)
-        labels['0x8808']= label
-        label = increment_hex_value(label)
-        labels['0x8809']= label
-        label = increment_hex_value(label)
-        labels['0x8809']= label
-        label = increment_hex_value(label)
-        labels['0x8847']= label
-        label = increment_hex_value(label)
-        labels['0x8848']= label
-        label = increment_hex_value(label)
-        labels['0x8863']= label
-        label = increment_hex_value(label)
-        labels['0x8864']= label
-        label = increment_hex_value(label)
-        labels['0x8870']= label
-        label = increment_hex_value(label)
-        labels['0x0800']= label
-        label = increment_hex_value(label)
-        labels['0x887B']= label
-        label = increment_hex_value(label)
-        labels['0x888E']= label
-        label = increment_hex_value(label)
-        labels['0x8892']= label
-        label = increment_hex_value(label)
-        labels['0x889A']= label
-        label = increment_hex_value(label)
-        labels['0x88A2']= label
-        label = increment_hex_value(label)
-        labels['0x88A4']= label
-        label = increment_hex_value(label)
-        labels['0x88A8']= label
-        label = increment_hex_value(label)
-        labels['0x88AB']= label
-        label = increment_hex_value(label)
-        labels['0x88CC']= label
-        label = increment_hex_value(label)
-        labels['0x88CD']= label
-        label = increment_hex_value(label)
-        labels['0x88E1']= label
-        label = increment_hex_value(label)
-        labels['0x88E3']= label
-        label = increment_hex_value(label)
-        labels['0x88E5']= label
-        label = increment_hex_value(label)
-        labels['0x88F7']= label
-        label = increment_hex_value(label)
-        labels['0x8902']= label
-        label = increment_hex_value(label)
-        labels['0x8906']= label
-        label = increment_hex_value(label)
-        labels['0x8914']= label
-        label = increment_hex_value(label)
-        labels['0x8915']= label
-        label = increment_hex_value(label)
-        labels['0x892F']= label
-        label = increment_hex_value(label)
-        labels['0x9000']= label
-        label = increment_hex_value(label)
-        labels['0xCAFE']= label
-        label = increment_hex_value(label)
+        for item in settings.SUPPORTED_ETHERTYPES:
+            labels[item] = label    
+            label = increment_hex_value(label)
+            
+        # labels['0x0800'] = label
+        # label = increment_hex_value(label)
+        # labels['0x0806']= label
+        # label = increment_hex_value(label)
+        # labels['0x0842']= label
+        # label = increment_hex_value(label)
+        # labels['0x22F0']= label
+        # label = increment_hex_value(label)
+        # labels['0x22F3']= label
+        # label = increment_hex_value(label)
+        # labels['0x6003']= label
+        # label = increment_hex_value(label)
+        # labels['0x8035']= label
+        # label = increment_hex_value(label)
+        # labels['0x809B']= label
+        # label = increment_hex_value(label)
+        # labels['0x80F3']= label
+        # label = increment_hex_value(label)
+        # labels['0x8100']= label
+        # label = increment_hex_value(label)
+        # labels['0x8137']= label
+        # label = increment_hex_value(label)
+        # labels['0x8138']= label
+        # label = increment_hex_value(label)
+        # labels['0x8204']= label
+        # label = increment_hex_value(label)
+        # labels['0x86DD']= label
+        # label = increment_hex_value(label)
+        # labels['0x8808']= label
+        # label = increment_hex_value(label)
+        # labels['0x8809']= label
+        # label = increment_hex_value(label)
+        # labels['0x8809']= label
+        # label = increment_hex_value(label)
+        # labels['0x8847']= label
+        # label = increment_hex_value(label)
+        # labels['0x8848']= label
+        # label = increment_hex_value(label)
+        # labels['0x8863']= label
+        # label = increment_hex_value(label)
+        # labels['0x8864']= label
+        # label = increment_hex_value(label)
+        # labels['0x8870']= label
+        # label = increment_hex_value(label)
+        # labels['0x0800']= label
+        # label = increment_hex_value(label)
+        # labels['0x887B']= label
+        # label = increment_hex_value(label)
+        # labels['0x888E']= label
+        # label = increment_hex_value(label)
+        # labels['0x8892']= label
+        # label = increment_hex_value(label)
+        # labels['0x889A']= label
+        # label = increment_hex_value(label)
+        # labels['0x88A2']= label
+        # label = increment_hex_value(label)
+        # labels['0x88A4']= label
+        # label = increment_hex_value(label)
+        # labels['0x88A8']= label
+        # label = increment_hex_value(label)
+        # labels['0x88AB']= label
+        # label = increment_hex_value(label)
+        # labels['0x88CC']= label
+        # label = increment_hex_value(label)
+        # labels['0x88CD']= label
+        # label = increment_hex_value(label)
+        # labels['0x88E1']= label
+        # label = increment_hex_value(label)
+        # labels['0x88E3']= label
+        # label = increment_hex_value(label)
+        # labels['0x88E5']= label
+        # label = increment_hex_value(label)
+        # labels['0x88F7']= label
+        # label = increment_hex_value(label)
+        # labels['0x8902']= label
+        # label = increment_hex_value(label)
+        # labels['0x8906']= label
+        # label = increment_hex_value(label)
+        # labels['0x8914']= label
+        # label = increment_hex_value(label)
+        # labels['0x8915']= label
+        # label = increment_hex_value(label)
+        # labels['0x892F']= label
+        # label = increment_hex_value(label)
+        # labels['0x9000']= label
+        # label = increment_hex_value(label)
+        # labels['0xCAFE']= label
+        # label = increment_hex_value(label)
 
         self.mpls_label_sec = label
 
@@ -895,7 +814,7 @@ class TopologyController(Singleton, object):
         s.tunnel_id =service.tunnel_id 
         s.IPv6_txhdr=service.IPv6_txhdr
 
-        #Asociates source and destination service nodes on MPLS core 7
+        #Asociates source and destination service nodes on MPLS core 
         src_node = self.nodes[service.ingress_core_node]
         dst_node = self.nodes[service.egress_core_node]
         ingress_interface = src_node.interfaces[service.ingress_interface]
@@ -967,7 +886,8 @@ class TopologyController(Singleton, object):
 
         result = True
 
-        print 'Service-ID: ' + sid
+        print 'Deletes Service wieth service-ID: ' + sid
+
         #Sanity check
         if self.servs.has_key(sid):
             #Remove service from services collection
@@ -982,57 +902,11 @@ class TopologyController(Singleton, object):
 
         return result
 
-    #No necesaria para el funcionamiento del prototipo inicialmente
-    def initialize_services(self):
-        '''
-        Crea un Servucio para cada trafico <ip_origen, ip_destino>. Esto garantiza conectividad para
-        todo tipo de trafico entre cualquier par de nodos LER de ingreso y LER de egreso
-        '''
-
-        #For each posible ingress node
-        for n_ingress in self.nodes.itervalues():
-
-            #Check if n is EDGE node and is OF enable node
-            if n_ingress.top_type == 1 and n_ingress.net_type == 1:
-
-                #Create Servuce for all posible EDGE nodes destinations
-                for n_egress in self.nodes.itervalues():
-
-                    #Check if n is EDGE node, OF enable and deifferent of first node
-                    if n_egress.router_id != n_ingress.router_id and n_egress.top_type == 1 and n_egress.net_type == 1:
-
-                        #Create FEC for all external interfaces on ingress node
-                        for i_in in n_ingress.interfaces.itervalues():
-                            if i_in.type == 1:
-
-                                #Create FEC for all externa; interfaces on egress node
-                                for i_egr in n_egress.interfaces.itervalues():
-                                    if i_egr.type == 1:
-
-                                        print 'INTERFAZ'
-                                        print i_in.ip_address
-                                        print i_egr.ip_address
-
-                                        #s = DTService(IPv4_src=i_in.ip_address, IPv4_dst=i_egr.ip_address)
-                                        s = DTService()
-                                        s.ingress_core_node = i_in.node.router_id
-                                        s.egress_core_node = i_egr.node.router_id
-                                        s.ingress_interface = i_in.ip_address  #Agregado verificar
-                                        s.egress_interface = i_egr.ip_address  #Agregado verificar
-                                        self.add_service(s)
-
-
     ########### LSPs primitives ############################
     def get_lsp(self, service):
         '''
         Creates LSP for specific service
         '''
-
-        print 'SERVICIo que trae'
-        print service.ingress_node
-        print service.egress_node
-        print service.ingress_interface
-        print service.egress_interface
 
         #Get the best path between source and destination nodes on MPLS core (Links collection)
         path = self.get_best_path(service.ingress_node, service.egress_node)
@@ -1054,36 +928,8 @@ class TopologyController(Singleton, object):
         ilm_add = {}
         ftn_add, ilm_add = self.update_mpls_tables(service, path, lsp_labels)
 
-        #Update OF tables
-        #Remove flow from FTN entry
-        # for ftn_key in ftn_add:
-        #     n = self.nodes[ftn_key]
-        #     ftn = ftn_add[ftn_key]
-        #     service = ftn.service
+        ### Update OF tables
 
-        #     #FTN for service service
-        #     print 'FTN for service : ' + str(service.name)
-
-        #     #First NHLFE refer to PUSH label asociated to service, second NHLFE refers to forwarding label
-        #     #So for this particular case we use two OF tables
-        #     for nhlfe in ftn.nhlfes:
-
-        #         print nhlfe.action
-
-        #         #Get ovs port for interface
-        #         interface = None 
-        #         if nhlfe.interface is not None:
-        #             interface = nhlfe.interface.ovs_port
-        #         #Get ovs port for next hop
-        #         next_hop = None 
-        #         if nhlfe.next_hop is not None:
-        #             next_hop = nhlfe.next_hop.ovs_port
-
-        #         datapath.install_node_flow_for_service(service=service, node=n, ovs_port_in=interface, 
-        #                                                 ovs_port_out=next_hop, label_in=None, 
-        #                                                 action=nhlfe.action)
-
-        #Update OF tables
         #Remove flow from FTN entry
         items = ftn_add.items()
         n = self.nodes[items[0][0]]
@@ -1118,7 +964,6 @@ class TopologyController(Singleton, object):
         for ilm_key in ilm_add:
             n = self.nodes[ilm_key]
             ilm = ilm_add[ilm_key]
-            #service = Service() #Uses empty services
 
             for nhlfe in ilm.nhlfes:
 
@@ -1148,11 +993,7 @@ class TopologyController(Singleton, object):
                                                         ovs_port_out=next_hop, label_in=service.label, 
                                                         action=action, interface=service.egress_interface)
 
-
         return lsp
-
-        #Agregate LSP to lsps controller collection
-        #self.lsps.append(lsp)
 
     def delete_lsp(self, service, lsp):
         '''
@@ -1311,8 +1152,6 @@ class TopologyController(Singleton, object):
                     nhlfe = ftn.nhlfes[1]
 
                 #Second NHLFE is entry for outer label                   
-                #nhlfe = ftn.nhlfes[1]
-
                 #Get ovs port for interface
                 interface = None 
                 if nhlfe.interface is not None:
@@ -1325,20 +1164,6 @@ class TopologyController(Singleton, object):
 
                 datapath.remove_ingress_node_flow_for_service(service=service, node=n, ovs_port_in=interface, 
                                                     ovs_port_out=next_hop, label_in=None, path_len=path_len)
-
-                # for nhlfe in ftn.nhlfes:
-
-                #     #Get ovs port for interface
-                #     interface = None 
-                #     if nhlfe.interface is not None:
-                #         interface = nhlfe.interface.ovs_port
-                #     #Get ovs port for next hop
-                #     next_hop = None 
-                #     if nhlfe.next_hop is not None:
-                #         next_hop = nhlfe.next_hop.ovs_port
-
-                #     datapath.remove_node_flow_for_service(service=service, node=n, ovs_port_in=interface, 
-                #                                             ovs_port_out=next_hop, label_in=None)
 
             #Remove flow from ILM entry
             for ilm_key in ilm_removes:
@@ -1362,9 +1187,6 @@ class TopologyController(Singleton, object):
                         datapath.remove_egress_node_flow_for_service(ilm.service, n, interface, next_hop, ilm.label)
                     else:
                         datapath.remove_node_flow_for_service(service, n, interface, next_hop, ilm.label)
-
-                    #datapath.remove_node_flow_for_service(service, n, interface, 
-                    #                                        next_hop, ilm.label)
 
     def get_path_mpls_labels(self, path):
         '''
@@ -1423,11 +1245,7 @@ class TopologyController(Singleton, object):
                 label = next_label
 
         
-        if label is None:
-            # If label is None then node have to many adjacencieas so fucking node
-            print 'Suitable label is None, we use wildcard label'
-            label = '0x00000'
-        else:
+        if label is not None:
             #Add label to the interface list of labels in use
             link.to_node_int.mpls_labels.append(label)
 
@@ -1461,7 +1279,6 @@ class TopologyController(Singleton, object):
                                      dst_ovs_port=i.link.to_node_int.ovs_port)
                     links.append(link)
 
-                #data = DTLSP(mpls_labels_path=mpls_labels, nodes_path=nodes, interfaces_path=interfaces)
                 data = DTLSP(links=links, mpls_labels_path=mpls_labels, nodes_path=nodes, interfaces_path=interfaces)
 
                 lsps.append(data)
@@ -1525,7 +1342,6 @@ class TopologyController(Singleton, object):
                 
                 #Instance FTN and NHLFE entry for first hop, if nhlfe already exists FTN reference existing entry,
                 #in other case creates new NHLFE entry
-                #nhlfe = NHLFE(interface=None, next_hop=path[0].from_node_int, action=None)
 
                 #Action for MPLS service label identification push
                 action = DTMPLSAction(label=service.label)
@@ -1606,7 +1422,6 @@ class TopologyController(Singleton, object):
                
                 #Instance FTN and NHLFE entry for first hop, if nhlfe already exists FTN reference existing entry,
                 #in other case creates new NHLFE entry
-                #nhlfe = NHLFE(interface=None, next_hop=path[0].from_node_int, action=action)
                 nhlfe = NHLFE(interface=service.ingress_interface, next_hop=path[0].from_node_int, action=action)
                 
                 nhlfe_entry = node.get_nhlfe_entry(nhlfe)
@@ -1624,8 +1439,6 @@ class TopologyController(Singleton, object):
                 ftn_adds[node.router_id] = ftn
 
                 #Install flow on datapath
-                #datapath.install_node_flow_for_service(service, node, None, path[0].from_node_int.ovs_port, 
-                #                                                None, action)
 
                 #Process all other nodes except penultimate and ultimate nodes
                 ingress_int = path[0].from_node_int
@@ -1663,11 +1476,6 @@ class TopologyController(Singleton, object):
                     #Add ILM entry
                     node.add_ilm_entry(ilm_entry)
                     ilm_adds[node.router_id] = ilm_entry
-
-                    #Install flow on datapath
-                    #datapath.install_node_flow_for_service(service, node, ingress_int.ovs_port, 
-                    #                                            path[i].from_node_int.ovs_port, 
-                    #                                            label_in, action)
 
                     #Update ingress interface and label for next hop
                     ingress_int = path[i].from_node_int
@@ -1729,151 +1537,9 @@ class TopologyController(Singleton, object):
                     #Ther is an ILM entry for specific service
                     ilm_entry.add_nhlfe_entry(nhlfe_entry)
                     ilm_adds[node.router_id] = ilm_entry
-
-                #Install flow on datapath
-                #datapath.install_node_flow_for_service(service, node, ingress_int.ovs_port, 
-                 #                                               path[len(path)-1].from_node_int.ovs_port, 
-                 #                                               label_in, action)    
+ 
 
         return ftn_adds, ilm_adds
-
-    # def update_mpls_tables_clean_path(self, service, path):
-    #     '''
-    #     For each node in the path, erase node mpls tables (FTN, NHLFE, ILM) according to 
-    #     the previously specific mpls processing. In case each entry have more than 1 references
-    #     only decrement the reference
-    #     '''
-
-    #     #Sanity check
-    #     if len(path) != 0:
-
-    #         # We process path according to the followings rules:
-    #         #    First node on path is a border core node thereforce we need to specify an FTN and NHLFE entries
-    #         #    All other nodes except last one are middle nodes thereforce we need to specify ILM and NHLFE entries
-    #         #    Last node is a border and egress node so traffic must arribe without labels to them. For that penultimate
-    #         #    hop does not push MPLS label
-
-    #         if len(path) == 1:
-
-    #             node = path[0].from_node_int.node
-                
-    #             #There is no labels and no penultimate hop, only a forwarding rule
-                
-    #             #Instance FTN and NHLFE entry for first hop, if nhlfe already exists FTN reference existing entry,
-    #             #in other case creates new NHLFE entry
-    #             nhlfe = NHLFE(interface=None, next_hop=path[0].from_node_int, action=None)
-                
-    #             node.decrement_nhlfe_entry_references(nhlfe)
-
-    #             ftn = FTN(service=service, nhlfes=[nhlfe_entry])
-                
-    #             #Remove FTN entry
-    #             node.remove_ftn_entry(ftn)
-
-    #             #self, service, node, ovs_port_in, ovs_port_out, label action
-    #             #datapath.install_node_flow_for_service(service, node, None, path[0].from_node_int.ovs_port, 
-    #              #                                       None, None)  
-    #         else:
-               
-    #             print 'ACA HAY CAMINO DE MAS DE 1'
-
-    #             # Path lenth is bigger than 1, so we have ingress node, penultimate hop and egress node
-    #             node = path[0].from_node_int.node
-
-    #             #Instance FTN and NHLFE entry for first hop
-    #             action = DTMPLSAction(label=mpls_labels[0])
-    #             action.set_action_PUSH()
-               
-    #             nhlfe = NHLFE(interface=None, next_hop=path[0].from_node_int, action=action)
-                
-    #             nhlfe_entry = node.get_nhlfe_entry(nhlfe)
-
-    #             if nhlfe_entry is None:
-    #                 nhlfe_entry = nhlfe
-               
-    #             #In case NHLFE entry already exist add_nhlfe_entry increment references counter
-    #             node.add_nhlfe_entry(nhlfe_entry)
-
-    #             ftn = FTN(service=service, nhlfes=[nhlfe_entry])
-    #             #Check if exists FTN entry for service
-    #             ftn_entry = node.get_ftn_entry(ftn)
-
-    #             if ftn_entry is None:
-    #                 #There is not an FTN entry for specific service
-    #                 node.add_ftn_entry(ftn)
-    #             else:
-    #                 #Ther is an FTN entry for specific service
-
-    #                 #Check if NHLFE is the same, otherwise replace them (future change for add)
-    #                 if ftn_entry.nhlfes[0] != nhlfe_entry:
-    #                     ftn_entry.nhlfes[0] =  nhlfe_entry
-
-    #             #Install flow on datapath
-    #             #datapath.install_node_flow_for_service(service, node, None, path[0].from_node_int.ovs_port, 
-    #             #                                                None, action)
-
-    #             #Process all other nodes except penultimate and ultimate nodes
-    #             ingress_int = path[0].from_node_int
-    #             label_in = mpls_labels[0]
-    #             for i in range(1, len(path)-1):
-    #                 node = path[i].from_node_int.node
-
-    #                 #Instance ILM and NHLFE entry
-    #                 action = DTMPLSAction(label=mpls_labels[i])
-    #                 action.set_action_SWAP()
-    #                 nhlfe = NHLFE(interface=ingress_int, next_hop=path[i].from_node_int, action=action)
-                
-    #                 nhlfe_entry = node.get_nhlfe_entry(nhlfe)
-
-    #                 if nhlfe_entry is None:
-    #                     nhlfe_entry = nhlfe
-                   
-    #                 #In case NHLFE entry already exist add_nhlfe_entry increment references counter
-    #                 node.add_nhlfe_entry(nhlfe_entry)
-
-    #                 ilm = ILM(label=label_in, nhlfes=[nhlfe])
-
-    #                 #Check if exists ILM entry for service
-    #                 ilm_entry = node.get_ilm_entry(ilm)
-
-    #                 if ilm_entry is None:
-    #                     #There is not an FTN entry for specific service
-    #                     node.add_ilm_entry(ilm)
-    #                 else:
-    #                     #Ther is an ILM entry for specific service
-
-    #                     #Add NHLE en
-    #                     node.ilm.add_nhlfe_entry(nhlfe_entry)
-                            
-
-
-    #                 #Install flow on datapath
-    #                 #datapath.install_node_flow_for_service(service, node, ingress_int.ovs_port, 
-    #                 #                                            path[i].from_node_int.ovs_port, 
-    #                 #                                            label_in, action)
-
-    #                 #Update ingress interface and label for next hop
-    #                 ingress_int = path[i].from_node_int
-    #                 label_in = mpls_labels[i]
-
-    #             #Process penultimate hop that is equal to process ultimate link
-    #             action = DTMPLSAction(label=label_in)
-    #             action.set_action_POP()
-    #             nhlfe = NHLFE(interface=ingress_int, next_hop=path[len(path)-1].from_node_int, action=action)
-
-    #             ilm = ILM(label=label_in, nhlfes=[nhlfe])
-                
-    #             node = path[len(path)-1].from_node_int.node
-                
-    #             #if not node.has_nhlfe_entry(nhlfe):
-    #             print 'Va a agregar un POP en ' + node.router_id
-    #             node.add_nhlfe_entry(nhlfe)
-    #             node.add_ilm_entry(ilm)
-
-    #             #Install flow on datapath
-    #             #datapath.install_node_flow_for_service(service, node, ingress_int.ovs_port, 
-    #              #                                               path[len(path)-1].from_node_int.ovs_port, 
-    #              #                                               label_in, action)    
 
     def update_services_lsps(self):
         '''
@@ -1926,7 +1592,7 @@ class TopologyController(Singleton, object):
                 service = ftn.service
 
                 nhlfe = None
-                path_len = len(ftn.nhlfes)#A los efectos de determinar si la entrada tiene 1 o 2 NHLFE sirve
+                path_len = len(ftn.nhlfes)
                 if path_len == 1:
                     nhlfe = ftn.nhlfes[0]
                 else:
@@ -1994,20 +1660,6 @@ class TopologyController(Singleton, object):
                 datapath.install_ingress_node_flow_for_service(service=service, node=n, ovs_port_in=interface, 
                                                         ovs_port_out=next_hop, label_in=None, 
                                                         action=nhlfe.action, path_len=path_len)
-                # for nhlfe in ftn.nhlfes:
-
-                #     #Get ovs port for interface
-                #     interface = None 
-                #     if nhlfe.interface is not None:
-                #         interface = nhlfe.interface.ovs_port
-                #     #Get ovs port for next hop
-                #     next_hop = None 
-                #     if nhlfe.next_hop is not None:
-                #         next_hop = nhlfe.next_hop.ovs_port
-
-                #     datapath.install_node_flow_for_service(service=service, node=n, ovs_port_in=interface, 
-                #                                             ovs_port_out=next_hop, label_in=None, 
-                #                                             action=nhlfe.action)
 
             #Install flows for new FTN entries
             for ilm in ilm_adds:
@@ -2041,7 +1693,7 @@ class TopologyController(Singleton, object):
         First recalculate path and for each hop check for diferents in old LSP
         ''' 
 
-        print 'Se actualiza LSP: (' + service.ingress_node.router_id + ',' + service.egress_node.router_id + ')' 
+        print 'Updates LSP for path: (' + service.ingress_node.router_id + ',' + service.egress_node.router_id + ')' 
 
 
         #Get the best path between source and destination nodes on MPLS core (Links collection)
@@ -2112,107 +1764,7 @@ class TopologyController(Singleton, object):
             if pe.label is not None:
                 pe.link.to_node_int.mpls_labels.remove(pe.label)
             
-            #Mark NHLFE entry as unused for this specific LSP hop
-            #pe.link.to_node_int.node
-
-            #nhlfe = NHLFE(interface=None, next_hop=path[0].from_node_int, action=None)
-                
-             #   nhlfe_entry = node.get_nhlfe_entry(nhlfe)
-
-              #  if nhlfe_entry is None:
-               #     nhlfe_entry = nhlfe
-
         return new_lsp
-
-    # def update_lsp_viejo(self, service, lsp):
-    #     '''
-    #     Update LSP
-    #     First recalculate path and for each hop check for diferents in old LSP
-
-    #     En caso de encontrar diferencias elimina/agrega las entradas que sean necesarias a la tanla de MPLS
-    #     '''
-
-    #     print 'Se actualiza LSP: (' + service.ingress_node.router_id + ',' + service.egress_node.router_id + ')' 
-
-    #     #Get the best path between source and destination nodes on MPLS core (Links collection)
-    #     path = self.get_best_path(service.ingress_node, service.egress_node)
-    #     labels = []
-
-    #     print 'BESTH PATH LENGTH:'+ str(len(path))
-
-    #     new_lsp_path = []
-    #     old_lsp_path = lsp.path
-
-    #     #We asign labels for mpls path secuencialy starting on the lowest label value
-    #     label_base = self.MPLS_LABEL_SPACE_MIN
-
-    #     if len(path) > 0:
-    #         if len(path) == 1:
-    #             l = path[0]
-    #             pe = self.get_lsp_entry_by_link(old_lsp_path, l)
-    #             if pe is None:
-    #                 #Get avaiable label
-    #                 label = None
-    #                 pe = PathNode(label=label, link=l)
-    #                 new_lsp_path.append(pe)
-    #                 labels.append(label)
-    #             else:
-    #                 new_lsp_path.append(pe)
-    #                 old_lsp_path.remove(pe)
-    #                 labels.append(pe.label)
-    #         else:
-
-    #             #Process all other elements    
-    #             for l in path[0:-1]:
-
-    #                 #Chequea si el link se corresponde con alguna entrada del path del lsp viejo, en ese caso no se debe cambiar 
-    #                 #datapath
-    #                 pe = self.get_lsp_entry_by_link(old_lsp_path, l)
-    #                 if pe is None:
-    #                     #Get avaiable label
-    #                     label = self.get_avaiable_mpls_label_for_interface(l, label_base)
-    #                     pe = PathNode(label=label, link=l)
-    #                     new_lsp_path.append(pe)
-    #                     labels.append(label)
-    #                 else:
-    #                     new_lsp_path.append(pe)
-    #                     old_lsp_path.remove(pe)
-    #                     labels.append(pe.label)
-
-    #             #Process the last element
-    #             pe = self.get_lsp_entry_by_link(old_lsp_path, path[-1])
-    #             if pe is None:
-    #                 pe = PathNode(label=None, link=path[-1])
-    #                 new_lsp_path.append(pe)
-    #                 labels.append(None)
-    #             else:
-    #                 new_lsp_path.append(pe)
-    #                 old_lsp_path.remove(pe)
-    #                 labels.append(pe.label)
-            
-    #     new_lsp = LSP(path=new_lsp_path)
-
-    #     #Update MPLS tables in each path node with specific label processing
-    #     self.update_mpls_tables(service, path, labels)
-
-    #     #Remove all MPLS table entries for nodes in old LSP there is not in new LSP and ree MPLS labels in interfaces
-    #     for pe in old_lsp_path:
-
-    #         #Removes mpls label for labels in use for interface
-    #         if pe.label is not None:
-    #             pe.link.to_node_int.mpls_labels.remove(pe.label)
-            
-    #         #Mark NHLFE entry as unused for this specific LSP hop
-    #         pe.link.to_node_int.node
-
-    #         nhlfe = NHLFE(interface=None, next_hop=path[0].from_node_int, action=None)
-                
-    #         nhlfe_entry = node.get_nhlfe_entry(nhlfe)
-
-    #         if nhlfe_entry is None:
-    #             nhlfe_entry = nhlfe
-
-    #     return new_lsp
 
     def get_lsp_entry_by_link(self, path, link):
 
@@ -2343,8 +1895,3 @@ class TopologyController(Singleton, object):
         node = self.get_of_node_by_datapath_id(dpid)
 
         result = datapath.send_table_stats_request(node.datapath, self.waiters)
-
-        print '+++++++++++++++++++++++++'
-
-        print str(result)
-        print '+++++++++++++++++++++++++'

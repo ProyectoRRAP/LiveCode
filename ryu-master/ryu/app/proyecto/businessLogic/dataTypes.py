@@ -13,7 +13,6 @@ class DTNode(object):
     classdocs
     '''
 
-
     def __init__(self, router_id, datapath_id, interfaces=None, status=None, net_type=None, 
                  top_type=None, description=None, of_ready=False, ls_ready=False, name=None):
         '''
@@ -32,14 +31,13 @@ class DTNode(object):
         self.ls_ready = ls_ready
 
     def to_JSON(self):
-        print 'Convierte a JSON'
-        #Convierte a JSON cada interfaz
+        #Convert to JSON each interface
         interfaces_json = []
         for i in self.interfaces.itervalues():
-            print 'Interfaz2' 
+
             links_json = []
             for l in i.links.itervalues():
-                print 'Link2' 
+               
                 links_json.append({'status': l.status, 'from_node_int': l.from_node_int.ip_address, 
                                     'to_node_int': l.to_node_int.ip_address, 'weight': str(l.weight)})
 
@@ -52,8 +50,6 @@ class DTNode(object):
                              'top_type': self.top_type,'description': self.description, 
                              'interfaces': interfaces_json}, indent=2)
 		
-
-        
 ##########################################################################
 ########## DTINTERFACE
 ##########################################################################
@@ -61,7 +57,6 @@ class DTInterface(object):
     '''
     classdocs
     '''
-
 
     def __init__(self, ip_address, links=None, mac_address=None, ovs_port=None, i_type=0, name=None, status=None,
                  ce_mac_address=None, ce_ip_address=None):
@@ -92,7 +87,6 @@ class DTLink(object):
     classdocs
     '''
 
-
     def __init__(self, from_node_int, to_node_int, status, mpls_label=None, weight=None):
         '''
         Constructor
@@ -113,12 +107,10 @@ class DTLSNode(object):
     classdocs
     '''
 
-
     def __init__(self, router_id, status, interfaces=None):
         '''
         Constructor
         '''
-        
         
         self.router_id = router_id
         self.status = status
@@ -129,10 +121,10 @@ class DTLSNode(object):
             self.interfaces = interfaces
 
     def to_JSON(self):
-        print 'Convierte a JSON'
-        #Convierte a JSON cada interfaz
+        #Convert to JSON each interface
         interfaces_json = []
         for i in self.interfaces.itervalues():
+
             links_json = []
             for l in i.links.itervalues():
                 links_json.append({'from_node_int': l.from_node_int.ip_address, 
@@ -149,7 +141,6 @@ class DTLSInterface(object):
     '''
     classdocs
     '''
-
 
     def __init__(self, node, ip_address, status=1, links=None):
         '''
@@ -184,7 +175,6 @@ class DTLSLink(object):
     classdocs
     '''
 
-
     def __init__(self, from_node_int, to_node_int, status=1, weight=None):
         '''
         Constructor
@@ -207,7 +197,6 @@ class DTLSLink(object):
             return result
         return not result
 
-
 ##########################################################################
 ########## DTPath
 ##########################################################################
@@ -217,7 +206,6 @@ class DTPath(object):
     DTPath represent a path between two nodes across the network
     Each entry represents a link
     '''
-
 
     def __init__(self, metric, path):
         '''
@@ -289,7 +277,6 @@ class DTFEC(object):
         self.PBB_is_id = PBB_is_id      # PBB I-SID. */
         self.tunnel_id = tunnel_id      # Logical Port Metadata. 
         self.IPv6_txhdr = IPv6_txhdr        # IPv6 Extension Header pseudo-field 
-
 
 ##########################################################################
 ########## DTService
@@ -374,7 +361,6 @@ class DTServiceLSP(object):
     classdocs
     '''
 
-
     def __init__(self, ID=None, lsps=None, color='RGB(0,0,0)', name=None):
         '''
         Constructor
@@ -392,7 +378,6 @@ class DTLSP(object):
     '''
     classdocs
     '''
-
 
     def __init__(self, links=None, mpls_labels_path=None, nodes_path=None, interfaces_path=None, metric=None, max_rate=None):
         '''
@@ -414,7 +399,6 @@ class DTLSPLink(object):
     '''
     classdocs
     '''
-
 
     def __init__(self, mpls_label=None, src_datapath_id=None, src_ovs_port=None, 
                     dst_datapath_id=None, dst_ovs_port=None):
@@ -444,7 +428,6 @@ class DTMPLSAction(object):
     2 -> SWAP mpls label
 
     '''
-
 
     def __init__(self, label=None, action=None):
         '''

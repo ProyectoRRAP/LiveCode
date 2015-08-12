@@ -114,16 +114,6 @@ class Node(object):
         if entry.references <= 0:
             self.nhlfe.remove(entry)
         
-
-
-   # def del_nhlfe_entry(self, nhlfe_id): 
-   #     '''
-   #     Remove NHLFE entry to the switch nhlfe's collection.
-   #     Params: nhlfe_id-> NHLFE entry ID
-   #     '''
-   #     
-   #     self.nhlfe.pop(nhlfe_id)
-        
     def clear_nhlfe(self):
         '''
         Remove all NHLFE instances from the ftn's collection 
@@ -168,14 +158,6 @@ class Node(object):
 
         if ilm is not None:
             self.ilm.remove(entry)
-                       
-    #def del_ilm_entry(self, ilm_id): 
-    #    '''
-    ###    Remove ILM entry to the switch ilm's collection.
-    #    Params: ilm_id-> ILM entry ID
-    #    '''
-    #    
-    #    self.nhlfe.pop(ilm_id) 
             
     def clear_ilm(self):
         '''
@@ -222,16 +204,6 @@ class Node(object):
 
         if ftn is not None:
             self.ftn.remove(entry)
-         
-                       
-
-    #def del_ftn_entry(self, ftn_id): 
-    #    '''
-    #    Remove FTN entry to the switch ftn's collection.
-    ##    Params: ftn_id-> FTN entry ID
-    #   '''
-        
-    #    self.nhlfe.pop(ftn_id) 
                     
     def clear_ftn(self):
         '''
